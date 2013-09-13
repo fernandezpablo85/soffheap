@@ -10,21 +10,31 @@ import java.io.ByteArrayInputStream
 import java.io.Serializable
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.concurrent.atomic.AtomicLong
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.Output
 import com.esotericsoftware.kryo.io.Input
 import com.despegar.offheap.serialization.Serializer
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializer: Serializer[HeapObject]) {
 
-  val referenceCount = new AtomicLong(1)
-  val offheapMemory = new UnsafeOffHeapMemory(serializer.serialize(heapObject))
+  val referenceCount = new AtomicInteger(1)
+  doSerialization(heapObject)
+  var address: Long = _
+  var length: Int = _
+
+  private def doSerialization(heapObject: HeapObject) = {
+    val serialized = serializer.serialize(heapObject)
+    length = serialized.length
+    address = SoffHeap.allocate(length)
+    SoffHeap.put(address,serialized)
+  }
 
   def get() = {
-    val buffer = new Array[Byte](offheapMemory.length);
-    offheapMemory.get(buffer);
-    serializer.deserialize(buffer);
+    val buffer = new Array[Byte](length)
+    SoffHeap.get(address,buffer)
+    serializer.deserialize(buffer)
   }
 
   def reference(): Boolean = {
@@ -40,8 +50,22 @@ class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializ
 
   def unreference() = {
     if (referenceCount.decrementAndGet() == 0) {
-      offheapMemory.free()
+      free()
     }
+  }
+
+  def free() {
+    SoffHeap.free(address, length);
+  }
+
+
+  override def toString() = {
+    val sb = new StringBuilder()
+    sb.append("UnsafeOffHeapMemory");
+    sb.append("{address=").append(address);
+    sb.append(", length=").append(length);
+    sb.append('}');
+    sb.toString();
   }
 
 }

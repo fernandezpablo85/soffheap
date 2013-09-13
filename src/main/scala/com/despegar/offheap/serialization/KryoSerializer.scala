@@ -13,7 +13,7 @@ class KryoSerializer[T] extends Serializer[T] {
       val kryo = new Kryo()
       val output = new Output(new ByteArrayOutputStream())
       kryo.writeClassAndObject(output, anObject)
-      output.getBuffer()
+      output.toBytes()
     } finally {
     	if (output != null) {
     		output.close()
@@ -26,5 +26,6 @@ class KryoSerializer[T] extends Serializer[T] {
     val input = new Input(bytes)
     kryo.readClassAndObject(input).asInstanceOf[T]
   }
+  
 
 }

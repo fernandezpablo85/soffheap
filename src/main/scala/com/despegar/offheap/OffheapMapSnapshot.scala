@@ -8,10 +8,11 @@ import com.despegar.offheap.serialization.Serializer
 import scala.collection.JavaConversions._
 import scala.collection.Iterable
 import java.io.Serializable
+import java.util.concurrent.ConcurrentHashMap
 
 class OffheapMapSnapshot[Key, Value] {
 
-  val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = TrieMap.empty
+  val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = new ConcurrentHashMap[Key, AtomicReference[OffheapReference[Value]]]()
   implicit val serializer: Serializer[Value] = new KryoSerializer[Value]
 
   def put(key: Key, value: Value): Unit = {
