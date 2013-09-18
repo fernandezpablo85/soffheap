@@ -4,6 +4,7 @@ import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 import java.util.concurrent.atomic.AtomicReference
+import com.despegar.offheap.SnapshotValue
 
 @RunWith(classOf[JUnitRunner])
 class FreeMemoryTest extends FlatSpec with Matchers {

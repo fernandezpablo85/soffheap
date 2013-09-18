@@ -5,15 +5,14 @@ import scala.concurrent.util.Unsafe
 import java.util.HashSet
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import com.despegar.offheap.metrics.SoffHeapWithMetrics
 
 class SoftHeap extends SoffHeapt {
   val UNSAFE = Unsafe.instance
   val BYTE_ARRAY_OFFSET = UNSAFE.arrayBaseOffset(classOf[Array[Byte]])
-  val allocatedBytes = new AtomicLong(0)
   
   
-  def allocate(bytes: Long) = {
-    allocatedBytes.addAndGet(bytes);
+  def allocate(bytes: Long): Long = {
     UNSAFE.allocateMemory(bytes);
   }
 

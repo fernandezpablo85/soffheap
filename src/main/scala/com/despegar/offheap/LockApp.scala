@@ -1,6 +1,7 @@
 package com.despegar.offheap
 
 import java.util.concurrent.Executors
+import com.despegar.offheap.SnapshotValue
 
 
 class LockApp extends App {

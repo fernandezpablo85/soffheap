@@ -8,15 +8,20 @@ public class SnapshotJavaClientTest {
 
 	@Test
 	public void shouldStoreObjectOutOfTheHeap() {
-		OffheapMapSnapshot<String, PojoValue> snapshot = new OffheapMapSnapshot<String, PojoValue>();
+//		OffheapMapSnapshot<String, PojoValue> snapshot = new OffheapMapSnapshot<String, PojoValue>();
+//		
+//		snapshot.put("key1", new PojoValue("value1",1l));
+//		
+//		PojoValue pojoValueInSnapshot = snapshot.javaGet("key1");
+//		
+//		assertEquals("value1", pojoValueInSnapshot.someString);
+//		assertEquals(1l, pojoValueInSnapshot.someLong.longValue());
+
+		String[] arrayOfStrings = new String[]{"hola", "chau"};
 		
-		snapshot.put("key1", new PojoValue("value1",1l));
+		System.out.println(arrayOfStrings.getClass());
 		
-		PojoValue pojoValueInSnapshot = snapshot.javaGet("key1");
-		
-		assertEquals("value1", pojoValueInSnapshot.someString);
-		assertEquals(1l, pojoValueInSnapshot.someLong.longValue());
-		
+//		
 	}
 	
 }

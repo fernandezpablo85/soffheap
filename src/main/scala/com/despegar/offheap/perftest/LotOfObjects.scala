@@ -13,40 +13,31 @@ import scala.collection.mutable.ListBuffer
 
 object LotOfObjects extends App {
 
-  val objectsCount = System.getProperty("objectsCount").toInt
+  val arrays = System.getProperty("arrays").toInt
+  val elements = System.getProperty("elements").toInt
 
   val snapshot = new OffheapMapSnapshot[String, Array[SnapshotValue]]
   def nonHeapMemoryUsage = ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage()
   def neapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage()
 
-  //  val snapshotSize = SoffHeap.sizeOf(classOf[OffheapMapSnapshot[_, _]])
-  //  val atomicReferenceSize = SoffHeap.sizeOf(classOf[AtomicReference[_]])
-  //  val offheapReferenceSize = SoffHeap.sizeOf(classOf[OffheapReference[_]])
-  //  
-  //  val size = snapshotSize + objectsCount*(atomicReferenceSize + offheapReferenceSize)
-
-  //  println(s"Heap size >= $size")
-
   val heapBefore = neapMemoryUsage.getUsed()
   val overheadPerObject = 24 + 16
 
-  (1 to objectsCount) foreach {
+  (1 to arrays) foreach {
     index =>
 
       val l: ListBuffer[SnapshotValue] = ListBuffer.empty
       
-      val elements = 1000
       (1 to elements) foreach { i =>  l += SnapshotValue(s"value$i", i)  }
+      
       val elementSize = SoffHeap.sizeOf(classOf[SnapshotValue])
+      println(s"el objeto en la heap ocupa ${elements * elementSize / 1024 / 1024} MB")
       
       val obj =   l.toArray
-      if (index % 100000 == 0) {
-//        val allocatedBytes = SoffHeap.allocatedBytes.get() / 1024 / 1024
-        println(s"storing object $index of size ${SoffHeap.sizeOf(obj)}, allocatedMB=$allocatedBytes, $nonHeapMemoryUsage")
-        val heapAveragePerObject = (neapMemoryUsage.getUsed() - heapBefore) / index
-        println(s"heap average per object = $heapAveragePerObject")
-      }
+
       snapshot.put(s"key$index", obj)
+      
+      val arrayFromOffheap = snapshot.get(s"key$index").get
   }
 
   while (true) {}

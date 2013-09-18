@@ -9,8 +9,11 @@ import scala.collection.JavaConversions._
 import scala.collection.Iterable
 import java.io.Serializable
 import java.util.concurrent.ConcurrentHashMap
+import scala.reflect._
+import scala.reflect.ClassTag
+import com.despegar.offheap.serialization.JavaSerializer
 
-class OffheapMapSnapshot[Key, Value] {
+class OffheapMapSnapshot[Key, Value: ClassTag] {
 
   val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = new ConcurrentHashMap[Key, AtomicReference[OffheapReference[Value]]]()
   implicit val serializer: Serializer[Value] = new KryoSerializer[Value]

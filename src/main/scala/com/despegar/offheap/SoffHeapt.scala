@@ -2,7 +2,7 @@ package com.despegar.offheap
 
 trait SoffHeapt {
 
-  def allocate(bytes: Long)
+  def allocate(bytes: Long): Long
 
   def free(address: Long, bytes: Int)
 

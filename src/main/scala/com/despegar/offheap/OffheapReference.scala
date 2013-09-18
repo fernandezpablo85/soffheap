@@ -16,8 +16,10 @@ import com.esotericsoftware.kryo.io.Input
 import com.despegar.offheap.serialization.Serializer
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import scala.reflect.ClassTag
+import com.despegar.offheap.metrics.Metrics
 
-class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializer: Serializer[HeapObject]) {
+class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializer: Serializer[HeapObject]) extends Metrics {
 
   val referenceCount = new AtomicInteger(1)
   doSerialization(heapObject)
@@ -32,9 +34,12 @@ class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializ
   }
 
   def get() = {
+    val timer = metrics.timer("materialize").time()
     val buffer = new Array[Byte](length)
     SoffHeap.get(address,buffer)
-    serializer.deserialize(buffer)
+    val deserializedObject = serializer.deserialize(buffer)
+    timer.stop()
+    deserializedObject
   }
 
   def reference(): Boolean = {

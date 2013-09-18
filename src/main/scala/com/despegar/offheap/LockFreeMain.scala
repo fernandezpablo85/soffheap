@@ -2,6 +2,7 @@ package com.despegar.offheap
 
 import com.despegar.offheap.serialization.KryoSerializer
 import java.util.concurrent.atomic.AtomicReference
+import com.despegar.offheap.SnapshotValue
 
 object LockFreeMain extends LockApp {
 
