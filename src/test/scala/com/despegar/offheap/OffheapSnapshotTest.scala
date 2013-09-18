@@ -2,8 +2,6 @@ package com.despegar.offheap
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicReference
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 import scala.reflect._
@@ -13,21 +11,21 @@ import scala.reflect._
 class OffheapSnapshotTest extends FlatSpec with Matchers {
 
   it should "store object out of the heap" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]();
+    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]()
     offheapSnapshot.put("key1", SnapshotValue("value", 1l))
 
-    val snapshotValue = offheapSnapshot.get("key1").get;
+    val snapshotValue = offheapSnapshot.get("key1").get
 
     snapshotValue.someString should be("value")
     snapshotValue.someLong.longValue() should be(1l)
   }
 
   it should "store array out of the heap" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, Array[PojoValue]]();
+    val offheapSnapshot = new OffheapMapSnapshot[String, Array[PojoValue]]()
 
     val listBuffer: ListBuffer[PojoValue] = ListBuffer.empty
 
-    val classTagOfArray = classTag[Array[PojoValue]].erasure
+    val classTagOfArray = classTag[Array[PojoValue]].runtimeClass
     
     println(s"the class of Array[SnapshotValue] is $classTagOfArray")
 
@@ -40,20 +38,20 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
     
     offheapSnapshot.put("key1", array)
 
-    val arrayFromOffheap = offheapSnapshot.get("key1").get;
+    val arrayFromOffheap = offheapSnapshot.get("key1").get
 
     arrayFromOffheap.length should be (elements)
   }
 
   it should "replace references" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]();
+    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]()
     offheapSnapshot.put("key1", SnapshotValue("value", 1l))
 
-    val snapshotValue1 = offheapSnapshot.get("key1").get;
+    val snapshotValue1 = offheapSnapshot.get("key1").get
 
     offheapSnapshot.put("key1", SnapshotValue("valuee", 2l))
 
-    val snapshotValue2 = offheapSnapshot.get("key1").get;
+    val snapshotValue2 = offheapSnapshot.get("key1").get
 
     snapshotValue1 should not be snapshotValue2
   }

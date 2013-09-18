@@ -1,66 +1,31 @@
 package com.despegar.offheap
 
-import java.util.concurrent.atomic.AtomicLong
-import scala.concurrent.util.Unsafe
 import java.util.HashSet
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import com.despegar.offheap.metrics.SoffHeapWithMetrics
+import com.despegar.offheap.metrics.SoffHeapMetrics
 
-class SoftHeap extends SoffHeapt {
-  val UNSAFE = Unsafe.instance
-  val BYTE_ARRAY_OFFSET = UNSAFE.arrayBaseOffset(classOf[Array[Byte]])
-  
-  
-  def allocate(bytes: Long): Long = {
-    UNSAFE.allocateMemory(bytes);
+trait SoffHeap extends Heap {
+
+  def allocate(bytes: Long):Long = {
+    allocatedBytes.addAndGet(bytes)
+    unsafe.allocateMemory(bytes)
   }
 
   def free(address: Long, bytes: Int) = {
-    UNSAFE.freeMemory(address);
+    unsafe.freeMemory(address)
   }
 
   def put(address: Long, buffer: Array[Byte]) = {
-    //        assert !disposed.get() : "disposed";
-    //        assert offset >= 0 : offset;
-    //        assert null != buffer;
-    //        assert offset <= length - buffer.length : offset;
-    //        assert buffer.length <= length : buffer.length;
-    UNSAFE.copyMemory(buffer, BYTE_ARRAY_OFFSET, null, address, buffer length);
+    unsafe.copyMemory(buffer, ByteArrayOffset, null, address, buffer.length)
   }
 
   def get(address: Long, buffer: Array[Byte]) = {
-    //        assert !disposed.get() : "disposed";
-    //        assert offset >= 0 : offset;
-    //        assert null != buffer;
-    //        assert offset <= length - buffer.length : offset;
-    //        assert buffer.length <= length : buffer.length;
-    UNSAFE.copyMemory(null, address, buffer, BYTE_ARRAY_OFFSET, buffer length);
+    unsafe.copyMemory(null, address, buffer, ByteArrayOffset, buffer.length)
   }
-
 }
 
-object SoffHeap {
-
-  val UNSAFE = Unsafe.instance
- 
-  val instance = new SoftHeap with SoffHeapWithMetrics
-  
-  def allocate(bytes: Long) = {
-   instance.allocate(bytes)
-  }
-
-  def free(address: Long, bytes: Int) = {
-    instance.free(address, bytes)
-  }
-
-  def put(address: Long, buffer: Array[Byte]) = {
-    instance.put(address, buffer)
-  }
-
-  def get(address: Long, buffer: Array[Byte]) = {
-    instance.get(address, buffer)
-  }
+object SoffHeap extends SoffHeap with SoffHeapMetrics {
 
   def sizeOf(c: Class[_]): Long = {
     val fields = new HashSet[Field]()
@@ -68,18 +33,18 @@ object SoffHeap {
     while (theClass != classOf[Object]) {
       for (f <- theClass.getDeclaredFields()) {
         if ((f.getModifiers() & Modifier.STATIC) == 0) {
-          fields.add(f);
+          fields.add(f)
         }
       }
-      theClass = c.getSuperclass();
+      theClass = c.getSuperclass()
     }
 
     // get offset
-    var maxSize: Long = 0;
+    var maxSize: Long = 0
     for (f <- fields.toArray()) {
-      val offset = UNSAFE.objectFieldOffset(f.asInstanceOf[Field])
+      val offset = unsafe.objectFieldOffset(f.asInstanceOf[Field])
       if (offset > maxSize) {
-        maxSize = offset;
+        maxSize = offset
       }
     }
 
@@ -89,5 +54,4 @@ object SoffHeap {
   def sizeOf(o: Any): Long = {
     sizeOf(o.getClass())
   }
-
 }

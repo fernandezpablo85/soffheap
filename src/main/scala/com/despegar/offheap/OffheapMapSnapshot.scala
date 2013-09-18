@@ -2,16 +2,12 @@ package com.despegar.offheap
 
 import scala.collection.mutable.Map
 import java.util.concurrent.atomic.AtomicReference
-import scala.collection.concurrent.TrieMap
 import com.despegar.offheap.serialization.KryoSerializer
 import com.despegar.offheap.serialization.Serializer
 import scala.collection.JavaConversions._
 import scala.collection.Iterable
-import java.io.Serializable
 import java.util.concurrent.ConcurrentHashMap
-import scala.reflect._
 import scala.reflect.ClassTag
-import com.despegar.offheap.serialization.JavaSerializer
 
 class OffheapMapSnapshot[Key, Value: ClassTag] {
 

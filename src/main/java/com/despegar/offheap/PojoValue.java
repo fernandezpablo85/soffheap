@@ -8,9 +8,6 @@ public class PojoValue implements Serializable {
 	public String someString;
 	public Long someLong;
 
-	public PojoValue() {
-	}
-	
 	public PojoValue(String someString , Long someLong) {
 		this.someString = someString;
 		this.someLong = someLong;

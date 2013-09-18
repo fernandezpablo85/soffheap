@@ -11,6 +11,4 @@ trait ScalaSnapshotTrait[Key, Value] {
   def reload(map: Map[Key, Value]): Unit
   
   def reload(iterable: Iterable[(Key, Value)]): Unit
-  
-  
 }

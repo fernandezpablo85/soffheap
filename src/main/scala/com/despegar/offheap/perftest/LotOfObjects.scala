@@ -1,13 +1,8 @@
 package com.despegar.offheap.perftest
 
 import com.despegar.offheap.OffheapMapSnapshot
-import com.despegar.offheap.SnapshotValue
-import javax.management.MXBean
 import java.lang.management.ManagementFactory
 import com.despegar.offheap.SoffHeap
-import com.despegar.offheap.PojoValue
-import java.util.concurrent.atomic.AtomicReference
-import com.despegar.offheap.OffheapReference
 import com.despegar.offheap.SnapshotValue
 import scala.collection.mutable.ListBuffer
 
@@ -41,5 +36,4 @@ object LotOfObjects extends App {
   }
 
   while (true) {}
-
 }

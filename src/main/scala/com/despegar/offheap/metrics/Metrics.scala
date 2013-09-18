@@ -1,23 +1,19 @@
 package com.despegar.offheap.metrics
 
-import com.codahale.metrics.MetricRegistry
-import com.codahale.metrics.ConsoleReporter
+import com.codahale.metrics.{ConsoleReporter, MetricRegistry}
 import java.util.concurrent.TimeUnit
-import com.codahale.metrics.JmxReporter
+import nl.grons.metrics.scala.InstrumentedBuilder
 
-trait Metrics {
-
-	val metrics = Metrics.metrics
-
+trait Metrics extends InstrumentedBuilder {
+   val metricRegistry = Metrics.metrics
 }
 
 object Metrics {
-  
   val metrics = new MetricRegistry()
 
-  val reporter = JmxReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS)
-    .convertDurationsTo(TimeUnit.MILLISECONDS)
-    .build()
-  reporter.start()
+  val reporter = ConsoleReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS)
+                                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                                .build()
+  reporter.start(5, TimeUnit.SECONDS)
   
 }
