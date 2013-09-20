@@ -1,31 +1,31 @@
 package com.despegar.offheap.perftest
 
-import com.despegar.offheap.OffheapMapSnapshot
+import com.despegar.offheap.map.OffheapMapSnapshot
 import com.despegar.offheap.SnapshotValue
 import scala.collection.mutable.ListBuffer
 import com.despegar.offheap.SoffHeap
+import java.util.concurrent.Executors
+import com.despegar.offheap.PojoValue
 
 object FreeMemory extends App {
 
-  val snapshot = new OffheapMapSnapshot[String, Array[SnapshotValue]]
-
   val arrays = System.getProperty("arrays").toInt
   val elements = System.getProperty("elements").toInt
+  val readers = System.getProperty("readers").toInt
+  val writers = System.getProperty("writers").toInt
 
-  (1 to arrays) foreach {
-    index =>
-
-      val array: ListBuffer[SnapshotValue] = ListBuffer.empty
-
-      (1 to elements) foreach { i => array += SnapshotValue(s"value$i", i) }
-      val elementSize = SoffHeap.sizeOf(classOf[SnapshotValue])
-
-      val obj = array.toArray
-
-      snapshot.put("alwaysSameKey", obj)
-      
+  val arrayWriter: (Unit => Array[PojoValue]) = { Unit =>
+    val listBuffer: ListBuffer[PojoValue] = ListBuffer.empty
+    (1 to elements) foreach { i => listBuffer += new PojoValue(s"value$i", i) }
+    listBuffer.toArray
   }
+    
+  val scenario = new ReadersWriterScenario[String, Array[PojoValue]](readers, writers, arrayWriter, { Unit => "alwaysSameKey" })
+
+  scenario.start()
   
-  while (true) {}
+  Thread.sleep(60000)
+  
+  scenario.stopWriters()
 
 }

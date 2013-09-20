@@ -5,6 +5,7 @@ import org.junit.runner.RunWith
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 import scala.reflect._
+import com.despegar.offheap.map.OffheapMapSnapshot
 
 
 @RunWith(classOf[JUnitRunner])
@@ -21,18 +22,18 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
   }
 
   it should "store array out of the heap" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, Array[PojoValue]]()
+    val offheapSnapshot = new OffheapMapSnapshot[String, Array[SnapshotValue]]()
 
-    val listBuffer: ListBuffer[PojoValue] = ListBuffer.empty
+    val listBuffer: ListBuffer[SnapshotValue] = ListBuffer.empty
 
-    val classTagOfArray = classTag[Array[PojoValue]].runtimeClass
+    val classTagOfArray = classTag[Array[SnapshotValue]].runtimeClass
     
     println(s"the class of Array[SnapshotValue] is $classTagOfArray")
 
     
     
     val elements = 1000
-    (1 to elements) foreach { i => listBuffer += new PojoValue(s"value$i", i) }
+    (1 to elements) foreach { i => listBuffer += SnapshotValue(s"value$i", i) }
 
     val array = listBuffer.toArray
     

@@ -3,6 +3,7 @@ package com.despegar.offheap.metrics
 import com.codahale.metrics.{JmxReporter, MetricRegistry}
 import java.util.concurrent.TimeUnit
 import nl.grons.metrics.scala.InstrumentedBuilder
+import com.codahale.metrics.JmxReporter
 
 trait Metrics extends InstrumentedBuilder {
   val metricRegistry = Metrics.metrics
@@ -32,5 +33,6 @@ object Metrics {
   val reporter = JmxReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS)
                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                             .build()
-  reporter.start
+  reporter.start()
+
 }

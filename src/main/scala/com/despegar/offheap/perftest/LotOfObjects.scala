@@ -1,6 +1,6 @@
 package com.despegar.offheap.perftest
 
-import com.despegar.offheap.OffheapMapSnapshot
+import com.despegar.offheap.map.OffheapMapSnapshot
 import java.lang.management.ManagementFactory
 import com.despegar.offheap.SoffHeap
 import com.despegar.offheap.SnapshotValue
