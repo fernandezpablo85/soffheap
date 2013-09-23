@@ -17,5 +17,9 @@ public class HeapCache<Key, Value> {
 	public void put(Key key, Value value) {
 		cache.put(key, value);
 	}
+
+    public void invalidate(Key key) {
+        cache.invalidate(key);
+    }
 	
 }

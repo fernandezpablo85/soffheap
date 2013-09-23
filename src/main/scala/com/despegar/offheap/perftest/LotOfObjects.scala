@@ -1,6 +1,6 @@
 package com.despegar.offheap.perftest
 
-import com.despegar.offheap.map.OffheapMapSnapshot
+import com.despegar.offheap.map.{OffheapMapBuilder, OffheapMapSnapshot}
 import java.lang.management.ManagementFactory
 import com.despegar.offheap.SoffHeap
 import com.despegar.offheap.SnapshotValue
@@ -11,7 +11,7 @@ object LotOfObjects extends App {
   val arrays = System.getProperty("arrays").toInt
   val elements = System.getProperty("elements").toInt
 
-  val snapshot = new OffheapMapSnapshot[String, Array[SnapshotValue]]
+  val snapshot = new OffheapMapBuilder[String,Array[SnapshotValue]]().withMaximumHeapElements(10).build()
   def nonHeapMemoryUsage = ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage()
   def neapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage()
 

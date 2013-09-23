@@ -5,14 +5,15 @@ import org.junit.runner.RunWith
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 import scala.reflect._
-import com.despegar.offheap.map.OffheapMapSnapshot
+import com.despegar.offheap.map.OffheapMapBuilder
 
 
 @RunWith(classOf[JUnitRunner])
 class OffheapSnapshotTest extends FlatSpec with Matchers {
 
   it should "store object out of the heap" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]()
+
+    val offheapSnapshot = new OffheapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("key1", SnapshotValue("value", 1l))
 
     val snapshotValue = offheapSnapshot.get("key1").get
@@ -22,7 +23,7 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
   }
 
   it should "store array out of the heap" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, Array[SnapshotValue]]()
+    val offheapSnapshot = new OffheapMapBuilder[String,Array[SnapshotValue]]().withMaximumHeapElements(10).build()
 
     val listBuffer: ListBuffer[SnapshotValue] = ListBuffer.empty
 
@@ -30,8 +31,6 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
     
     println(s"the class of Array[SnapshotValue] is $classTagOfArray")
 
-    
-    
     val elements = 1000
     (1 to elements) foreach { i => listBuffer += SnapshotValue(s"value$i", i) }
 
@@ -45,7 +44,8 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
   }
 
   it should "replace references" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]()
+
+    val offheapSnapshot = new OffheapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("key1", SnapshotValue("value", 1l))
 
     val snapshotValue1 = offheapSnapshot.get("key1").get
@@ -58,7 +58,7 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
   }
 
   it should "full reload a snapshot" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]()
+    val offheapSnapshot = new OffheapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("keyToBeUpdated", SnapshotValue("value1", 1l))
     offheapSnapshot.put("keyToBeRemoved", SnapshotValue("value2", 2l))
 
@@ -71,7 +71,7 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
   }
 
   it should "incrementally reload a snapshot" in {
-    val offheapSnapshot = new OffheapMapSnapshot[String, SnapshotValue]()
+    val offheapSnapshot = new OffheapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("keyToBeUpdated", SnapshotValue("value1", 1l))
     offheapSnapshot.put("keyToBeRemoved", SnapshotValue("value2", 2l))
 

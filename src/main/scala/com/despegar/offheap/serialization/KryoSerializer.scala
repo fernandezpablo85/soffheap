@@ -4,19 +4,16 @@ import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.Output
 import java.io.ByteArrayOutputStream
 import com.esotericsoftware.kryo.io.Input
-import scala.reflect._
 import com.despegar.offheap.metrics.Metrics
 import org.objenesis.strategy.StdInstantiatorStrategy
 
-class KryoSerializer[T: ClassTag] extends Serializer[T] with Metrics {
-
-  val classOfT = classTag[T].runtimeClass
+class KryoSerializer[T] extends Serializer[T] with Metrics {
 
   override def serialize(anObject: T): Array[Byte] = metrics.timer("serialize").time {
     val kryo = kryoFactory.newInstance()
     val outputStream = new ByteArrayOutputStream()
     val output = new Output(outputStream)
-    kryo.writeObject(output, anObject)
+    kryo.writeClassAndObject(output, anObject)
     output.flush()
     val bytes = outputStream.toByteArray()
     output.close()
@@ -25,14 +22,13 @@ class KryoSerializer[T: ClassTag] extends Serializer[T] with Metrics {
 
   override def deserialize(bytes: Array[Byte]): T = metrics.timer("deserialize").time {
     val kryo = kryoFactory.newInstance()
-    val input = new Input(bytes)
-    kryo.readObject(input, classOfT).asInstanceOf[T]
+    kryo.readClassAndObject(new Input(bytes)).asInstanceOf[T]
   }
 
   val kryoFactory = new Factory[Kryo] {
     def newInstance(): Kryo = {
       val kryo = new Kryo()
-//      kryo.setInstantiatorStrategy(new StdInstantiatorStrategy())
+      kryo.setInstantiatorStrategy(new StdInstantiatorStrategy())
       kryo.setReferences(false)
       kryo
     }

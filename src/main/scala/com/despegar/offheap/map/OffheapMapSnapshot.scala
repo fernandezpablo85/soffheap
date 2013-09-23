@@ -6,15 +6,12 @@ import com.despegar.offheap.serialization.KryoSerializer
 import scala.collection.JavaConversions._
 import scala.collection.Iterable
 import java.util.concurrent.ConcurrentHashMap
-import scala.reflect.ClassTag
 import com.despegar.offheap.metrics.Metrics
-import com.despegar.offheap.CacheFactory
 import com.despegar.offheap.HeapCache
 import com.despegar.offheap.OffheapReference
 
-class OffheapMapSnapshot[Key, Value: ClassTag] extends Metrics {
+class OffheapMapSnapshot[Key, Value]()(implicit cache :HeapCache[Key, Value]) extends Metrics {
 
-  val cache: HeapCache[Key, Value] = CacheFactory.create()
   val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = new ConcurrentHashMap[Key, AtomicReference[OffheapReference[Value]]]()
   implicit val serializer = new KryoSerializer[Value]
 
@@ -24,6 +21,7 @@ class OffheapMapSnapshot[Key, Value: ClassTag] extends Metrics {
       if (option.isDefined) {
         val oldReference = option.get.getAndSet(new OffheapReference(value))
         oldReference.unreference()
+        cache.invalidate(key)
       }
     } else {
       snapshot.put(key, new AtomicReference[OffheapReference[Value]](new OffheapReference[Value](value)))
@@ -38,7 +36,7 @@ class OffheapMapSnapshot[Key, Value: ClassTag] extends Metrics {
     get(key).getOrElse(null.asInstanceOf[Value])
   }
 
-  def get(key: Key): Option[Value] = metrics.timer("get").time {
+  def get(key: Key): Option[Value] =  {
     val cachedValue = cache.get(key)
     if (cachedValue != null) return Some(cachedValue)
     while (true) {
