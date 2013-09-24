@@ -1,10 +1,10 @@
 package com.despegar.offheap.perftest
 
-import scala.collection.mutable.ListBuffer
+import com.despegar.offheap.map.OffheapMapSnapshot
 import com.despegar.offheap.PojoValue
-import com.despegar.offheap.metrics.Metrics
+import scala.collection.mutable.ListBuffer
 
-object FreeMemory extends App {
+class HeapVsSoffheap {
 
   val arrays = System.getProperty("arrays").toInt
   val elements = System.getProperty("elements").toInt
@@ -16,7 +16,7 @@ object FreeMemory extends App {
     (1 to elements) foreach { i => listBuffer += new PojoValue(s"value$i", i) }
     listBuffer.toArray
   }
-
+    
   val scenario = new ReadersWriterScenario[String, Array[PojoValue]](readers, writers, arrayWriter, { Unit => "alwaysSameKey" })
 
   scenario.start()

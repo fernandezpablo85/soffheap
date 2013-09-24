@@ -9,8 +9,10 @@ import java.util.concurrent.ConcurrentHashMap
 import com.despegar.offheap.metrics.Metrics
 import com.despegar.offheap.HeapCache
 import com.despegar.offheap.OffheapReference
+import com.despegar.offheap.serialization.Serializer
+import scala.reflect.ClassTag
 
-class OffheapMapSnapshot[Key, Value]()(implicit cache :HeapCache[Key, Value]) extends Metrics {
+class OffheapMapSnapshot[Key, Value: ClassTag]()(implicit cache :HeapCache[Key, Value]) extends Metrics {
 
   val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = new ConcurrentHashMap[Key, AtomicReference[OffheapReference[Value]]]()
   implicit val serializer = new KryoSerializer[Value]
@@ -30,6 +32,11 @@ class OffheapMapSnapshot[Key, Value]()(implicit cache :HeapCache[Key, Value]) ex
 
   def size() = {
     snapshot.size
+  }
+  
+  def clear() = {
+    snapshot.foreach { entry => entry._2.get().unreference }
+    snapshot.clear()
   }
 
   def javaGet(key: Key): Value = {

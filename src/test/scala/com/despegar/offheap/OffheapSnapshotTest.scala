@@ -29,8 +29,6 @@ class OffheapSnapshotTest extends FlatSpec with Matchers {
 
     val classTagOfArray = classTag[Array[SnapshotValue]].runtimeClass
     
-    println(s"the class of Array[SnapshotValue] is $classTagOfArray")
-
     val elements = 1000
     (1 to elements) foreach { i => listBuffer += SnapshotValue(s"value$i", i) }
 

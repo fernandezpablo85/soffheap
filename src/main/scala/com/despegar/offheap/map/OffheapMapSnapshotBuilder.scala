@@ -1,9 +1,10 @@
 package com.despegar.offheap.map
 
 import com.despegar.offheap.{CacheFactory, HeapCache}
+import scala.reflect.ClassTag
 
 
-class OffheapMapBuilder[K, V] {
+class OffheapMapBuilder[K, V: ClassTag] {
 
   private var theElements:Option[Int] = None
   private var theSize:Option[Long] = None
