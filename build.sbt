@@ -13,6 +13,8 @@ publishMavenStyle := true
 publishTo := Some ( Resolver .file( "file" , new File ( Path .userHome.absolutePath+ "/.m2/repository" )))
 
 resolvers += "Nexus" at "http://nexus.despegar.it:8080/nexus/content/groups/proxies"
+
+crossPaths := false
     
 libraryDependencies ++= Seq(
     "com.esotericsoftware.kryo"     %  "kryo"           % "2.22",
