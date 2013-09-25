@@ -2,12 +2,15 @@ scalaVersion := "2.10.2"
 
 name := "soffheap"
 
-    // we need to add the runtime classpath as a "-cp" argument to the `javaOptions in run`, otherwise caliper
-    // will not see the right classpath and die with a ConfigurationException
-    javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) }
-    
-    fork in run := true
+// we need to add the runtime classpath as a "-cp" argument to the `javaOptions in run`, otherwise caliper
+// will not see the right classpath and die with a ConfigurationException
+javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) }
 
+fork in run := true
+
+publishMavenStyle := true
+
+publishTo := Some ( Resolver .file( "file" , new File ( Path .userHome.absolutePath+ "/.m2/repository" )))
 
 resolvers += "Nexus" at "http://nexus.despegar.it:8080/nexus/content/groups/proxies"
     

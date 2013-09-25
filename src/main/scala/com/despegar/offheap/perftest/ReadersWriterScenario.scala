@@ -18,7 +18,7 @@ class ReadersWriterScenario[Key, Value: ClassTag](readers: Int, writers: Int, va
   def startReaders() = {
 
     (1 to readers) foreach { i =>
-      readersExecutor.submit(new Reader(snapshot, keyFactory))
+      readersExecutor.submit(new MultiGetReader(snapshot, keyFactory))
     }
 
   }

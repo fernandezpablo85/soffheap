@@ -6,10 +6,12 @@ import com.despegar.offheap.metrics.Metrics
 
 class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializer: Serializer[HeapObject]) extends Metrics {
 
+  private [this] val materializeTimer = metrics.timer("materialize")
   val referenceCount = new AtomicInteger(1)
   doSerialization(heapObject)
   var address: Long = _
   var length: Int = _
+  
 
   private def doSerialization(heapObject: HeapObject) = {
     val serialized = serializer.serialize(heapObject)
@@ -18,8 +20,8 @@ class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializ
     SoffHeap.put(address,serialized)
   }
 
-  def get() = metrics.timer("materialize").time {
-    val buffer = new Array[Byte](length)
+  def get() = materializeTimer.time {
+	val buffer = new Array[Byte](length) 
     SoffHeap.get(address,buffer)
     serializer.deserialize(buffer)
   }

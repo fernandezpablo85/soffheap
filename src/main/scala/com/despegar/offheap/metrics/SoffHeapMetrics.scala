@@ -41,18 +41,17 @@ trait SoffHeapMetrics extends Heap with Metrics {
   }
 
   abstract override def put(address: Long, buffer: Array[Byte])= {
-    writeBytes.inc(toKB(buffer.length))
 
     putTime.time {
+    	writeBytes.inc(toKB(buffer.length))
       super.put(address, buffer)
     }
   }
 
   abstract override def get(address: Long, buffer: Array[Byte])= {
-    readBytes.inc(toKB(buffer.length))
-
     getTime.time {
-      super.get(address, buffer)
+    	readBytes.inc(toKB(buffer.length))
+      unsafe.copyMemory(null, address, buffer, ByteArrayOffset, buffer.length)
     }
   }
 
