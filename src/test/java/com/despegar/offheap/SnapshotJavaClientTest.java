@@ -15,7 +15,7 @@ public class SnapshotJavaClientTest {
 		
 		OffheapMapBuilder<String, PojoValue> builder = SnapshotBuilderFactory.createBuilder(PojoValue.class);
 
-		OffheapMapSnapshot<String, PojoValue> snapshot = builder.withMaximumOffheapSize(100).build();
+		OffheapMapSnapshot<String, PojoValue> snapshot = builder.withMaximumHeapElements(100).build();
 
 		snapshot.put("key1", new PojoValue("value1",1l));
 

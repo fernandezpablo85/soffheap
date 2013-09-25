@@ -7,20 +7,19 @@ import scala.reflect.ClassTag
 class OffheapMapBuilder[K, V: ClassTag] {
 
   private var theElements:Option[Int] = None
-  private var theSize:Option[Long] = None
 
   def withMaximumHeapElements(elements: Int) = {
     theElements = Some(elements)
     this
   }
 
-  def withMaximumOffheapSize(size: Long) = {
-    theSize = Some(size)
+  def withMaxSoffHeapMemoryInGB(size: Long) = {
+    System.setProperty("maxSoffHeapMemoryInGB", s"$size")
     this
   }
 
   def build() = {
-    implicit val cache: HeapCache[K, V] = CacheFactory.create(theSize.getOrElse(100l).toLong)
+    implicit val cache: HeapCache[K, V] = CacheFactory.create(theElements.getOrElse(100).toLong)
     new OffheapMapSnapshot[K,V]()
   }
   

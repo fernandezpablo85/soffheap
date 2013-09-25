@@ -16,11 +16,13 @@ import java.util.concurrent.ThreadPoolExecutor
 
 class OffheapMapSnapshot[Key, Value: ClassTag]()(implicit cache: HeapCache[Key, Value]) extends Metrics {
 
-  private [this] val multiGetTimer = metrics.timer("multiGet")
+  private[this] val multiGetTimer = metrics.timer("multiGet")
+  private[this] val cacheHits = metrics.counter("cacheHits")
+  private[this] val cacheMisses = metrics.counter("cacheMisses")
   val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = new ConcurrentHashMap[Key, AtomicReference[OffheapReference[Value]]]()
   implicit val serializer = new KryoSerializer[Value]
-//  val taskSupport = new ThreadPoolTaskSupport()
-  
+  //  val taskSupport = new ThreadPoolTaskSupport()
+
   def put(key: Key, value: Value): Unit = {
     if (snapshot.contains(key)) {
       val option = snapshot.get(key)
@@ -37,7 +39,7 @@ class OffheapMapSnapshot[Key, Value: ClassTag]()(implicit cache: HeapCache[Key, 
   def size() = {
     snapshot.size
   }
-  
+
   def clear() = {
     snapshot.foreach { entry => entry._2.get().unreference }
     snapshot.clear()
@@ -47,9 +49,13 @@ class OffheapMapSnapshot[Key, Value: ClassTag]()(implicit cache: HeapCache[Key, 
     get(key).getOrElse(null.asInstanceOf[Value])
   }
 
-  def get(key: Key): Option[Value] =  {
-//    val cachedValue = cache.get(key)
-//    if (cachedValue != null) return Some(cachedValue)
+  def get(key: Key): Option[Value] = {
+    val cachedValue = cache.get(key)
+    if (cachedValue != null) {
+      cacheHits.inc(1)
+      return Some(cachedValue)
+    }
+    cacheMisses.inc(1)
     while (true) {
       val option = snapshot.get(key)
       if (!option.isDefined) return None
@@ -68,13 +74,13 @@ class OffheapMapSnapshot[Key, Value: ClassTag]()(implicit cache: HeapCache[Key, 
     }
     None
   }
-  
+
   def multiGet(keys: List[Key]): Seq[Value] = multiGetTimer.time {
-//    val parallelKeys = keys.par
-//    val split = keys.splitAt(keys.size / 2)
-//    val splitZipped = split.
-//    parallelKeys.tasksupport = taskSupport
-    keys.map{ key => get(key) }.flatMap{ option => option }
+    //    val parallelKeys = keys.par
+    //    val split = keys.splitAt(keys.size / 2)
+    //    val splitZipped = split.
+    //    parallelKeys.tasksupport = taskSupport
+    keys.map { key => get(key) }.flatMap { option => option }
   }
 
   def reload(map: Map[Key, Value]) = {
