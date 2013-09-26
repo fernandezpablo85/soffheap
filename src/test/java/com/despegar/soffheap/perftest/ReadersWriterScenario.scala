@@ -3,10 +3,11 @@ package com.despegar.soffheap.perftest
 import com.despegar.soffheap.map.{SoffHeapMapBuilder, SoffHeapMap}
 import scala.reflect.ClassTag
 import java.util.concurrent.Executors
+import com.despegar.soffheap.ProviderMappingInfo
 
-class ReadersWriterScenario[Key, Value: ClassTag](readers: Int, writers: Int, valueFactory: (Unit => Value), keyFactory: (Unit => Key)) {
+class ReadersWriterScenario[Key, Value](readers: Int, writers: Int, valueFactory: (Unit => Value), keyFactory: (Unit => Key)) {
 
-  val snapshot = new SoffHeapMapBuilder[Key,Value]().build()
+  val soffheapMap = SoffHeapMapBuilder.of[Key,Value]().withKryo.build()
   val readersExecutor = Executors.newFixedThreadPool(readers)
   val writersExecutor = Executors.newFixedThreadPool(writers)
 
@@ -18,14 +19,14 @@ class ReadersWriterScenario[Key, Value: ClassTag](readers: Int, writers: Int, va
   def startReaders() = {
 
     (1 to readers) foreach { i =>
-      readersExecutor.submit(new MultiGetReader(snapshot, keyFactory))
+      readersExecutor.submit(new MultiGetReader(soffheapMap, keyFactory))
     }
 
   }
   
   def startWriters() = {
     (1 to writers) foreach { i =>
-      writersExecutor.submit(new Writer(snapshot, keyFactory, valueFactory))
+      writersExecutor.submit(new Writer(soffheapMap, keyFactory, valueFactory))
     }
   }
   

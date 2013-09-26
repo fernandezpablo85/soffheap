@@ -8,19 +8,18 @@ import java.io.ByteArrayOutputStream
 import com.esotericsoftware.kryo.io.UnsafeOutput
 import com.esotericsoftware.kryo.io.UnsafeInput
 import java.util.concurrent.ConcurrentLinkedQueue
+import com.despegar.soffheap.serialization.SerializerFactory
 
-class KryoSerializer[T: ClassTag] extends Serializer[T] with Metrics {
+class KryoSerializer[T](hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics {
 
   private[this] val serializeTimer = metrics.timer("serialize")
   private[this] val deserializeTimer = metrics.timer("deserialize")
 
-  val classOfT = classTag[T].runtimeClass
-
   val kryoFactory = new Factory[Kryo] {
     def newInstance(): Kryo = {
       val kryo = new Kryo()
-      kryo.register(classOfT)
       kryo.setReferences(false)
+      hintedClasses.foreach( hintedClass => kryo.register(hintedClass))
       kryo
     }
   }
@@ -45,7 +44,8 @@ class KryoSerializer[T: ClassTag] extends Serializer[T] with Metrics {
     }
   }
 
-  override def deserialize(bytes: Array[Byte]): T = deserializeTimer.time {
+  override def deserialize(bytes: Array[Byte]): T = { 
+//    deserializeTimer.time {
     val kryoHolder = pool.take()
     try {
       val kryo = kryoHolder
@@ -87,4 +87,12 @@ class KryoPool(factory: Factory[Kryo], kryoInstances: Int) {
     objects.clear()
   }
 
+}
+
+
+class KryoSerializerFactory extends SerializerFactory {
+  
+  override def create[T](hintedClasses: List[Class[_]]) = {
+     new KryoSerializer[T](hintedClasses)
+  }
 }

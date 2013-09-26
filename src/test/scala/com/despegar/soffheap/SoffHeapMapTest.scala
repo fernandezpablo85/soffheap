@@ -13,7 +13,7 @@ class SoffHeapMapTest extends FlatSpec with Matchers {
 
   it should "store object out of the heap" in {
 
-    val offheapSnapshot = new SoffHeapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
+    val offheapSnapshot = SoffHeapMapBuilder.of[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("key1", SnapshotValue("value", 1l))
 
     val snapshotValue = offheapSnapshot.get("key1").get
@@ -23,7 +23,7 @@ class SoffHeapMapTest extends FlatSpec with Matchers {
   }
 
   it should "store array out of the heap" in {
-    val offheapSnapshot = new SoffHeapMapBuilder[String,Array[SnapshotValue]]().withMaximumHeapElements(10).build()
+    val offheapSnapshot = SoffHeapMapBuilder.of[String,Array[SnapshotValue]]().withMaximumHeapElements(10).build()
 
     val listBuffer: ListBuffer[SnapshotValue] = ListBuffer.empty
 
@@ -43,7 +43,7 @@ class SoffHeapMapTest extends FlatSpec with Matchers {
 
   it should "replace references" in {
 
-    val offheapSnapshot = new SoffHeapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
+    val offheapSnapshot = SoffHeapMapBuilder.of[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("key1", SnapshotValue("value", 1l))
 
     val snapshotValue1 = offheapSnapshot.get("key1").get
@@ -56,7 +56,7 @@ class SoffHeapMapTest extends FlatSpec with Matchers {
   }
 
   it should "full reload a snapshot" in {
-    val offheapSnapshot = new SoffHeapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
+    val offheapSnapshot = SoffHeapMapBuilder.of[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("keyToBeUpdated", SnapshotValue("value1", 1l))
     offheapSnapshot.put("keyToBeRemoved", SnapshotValue("value2", 2l))
 
@@ -69,7 +69,7 @@ class SoffHeapMapTest extends FlatSpec with Matchers {
   }
 
   it should "incrementally reload a snapshot" in {
-    val offheapSnapshot = new SoffHeapMapBuilder[String,SnapshotValue]().withMaximumHeapElements(10).build()
+    val offheapSnapshot = SoffHeapMapBuilder.of[String,SnapshotValue]().withMaximumHeapElements(10).build()
     offheapSnapshot.put("keyToBeUpdated", SnapshotValue("value1", 1l))
     offheapSnapshot.put("keyToBeRemoved", SnapshotValue("value2", 2l))
 

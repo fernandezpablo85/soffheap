@@ -6,10 +6,10 @@ trait SoffHeapMetrics extends Heap with Metrics {
 
   private[this] val MaxSoffHeapMemory = maxSoffHeapMemoryInGB()
 
-  private[this] val allocatedKB = metrics.counter("allocatedKB")
+  private[this] val allocatedBytes = metrics.counter("allocatedBytes")
   private[this] val allocateTime = metrics.timer("allocateTime")
 
-  private[this] val freedKB = metrics.counter("freedKB")
+  private[this] val freedBytes = metrics.counter("freedBytes")
   private[this] val freeTime = metrics.timer("freeTime")
 
   private[this] val writeBytes = metrics.counter("writeBytes")
@@ -18,13 +18,13 @@ trait SoffHeapMetrics extends Heap with Metrics {
   private[this] val readBytes = metrics.counter("readBytes")
   private[this] val getTime = metrics.timer("getTime")
 
-  private[this] val usedOffMemoryKB = metrics.counter("usedOffMemoryKB")
-  private[this] val remainingOffMemoryKB = metrics.gauge("remainingOffMemoryKB") {calculateRemainingOffMemory()}
+  private[this] val usedOffMemoryBytes = metrics.counter("usedOffMemoryBytes")
+  private[this] val remainingOffMemoryBytes = metrics.gauge("remainingOffMemoryBytes") {calculateRemainingOffMemory()}
 
   abstract override def allocate(bytes: Long) = {
-    allocatedKB.inc(toKB(bytes))
-    usedOffMemoryKB.inc(toKB(bytes))
-    remainingOffMemoryKB.value
+    allocatedBytes.inc(bytes)
+    usedOffMemoryBytes.inc(bytes)
+    remainingOffMemoryBytes.value
 
     allocateTime.time {
       super.allocate(bytes)
@@ -32,8 +32,8 @@ trait SoffHeapMetrics extends Heap with Metrics {
   }
 
   abstract override def free(address: Long, bytes: Int) = {
-    freedKB.inc(toKB(bytes))
-    usedOffMemoryKB.dec(toKB(bytes))
+    freedBytes.inc(bytes)
+    usedOffMemoryBytes.dec(bytes)
 
     freeTime.time {
       super.free(address, bytes)
@@ -43,7 +43,7 @@ trait SoffHeapMetrics extends Heap with Metrics {
   abstract override def put(address: Long, buffer: Array[Byte])= {
 
     putTime.time {
-    	writeBytes.inc(toKB(buffer.length))
+    	writeBytes.inc(buffer.length)
       super.put(address, buffer)
     }
   }
@@ -56,7 +56,7 @@ trait SoffHeapMetrics extends Heap with Metrics {
   }
 
   private[this] def calculateRemainingOffMemory():Long = {
-    val remainingOffMemory = MaxSoffHeapMemory - usedOffMemoryKB.count
+    val remainingOffMemory = MaxSoffHeapMemory - usedOffMemoryBytes.count
 
     if(remainingOffMemory <= 0) throw new OutOfMemoryError(s"Memory limit exceeded -> $MaxSoffHeapMemory")
 

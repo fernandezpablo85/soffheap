@@ -23,7 +23,7 @@ object DbsProviderMappingTest extends App {
 
   val rand = new Random()
   val scenario = new ReadersWriterScenario[Long, java.util.ArrayList[ProviderMappingInfo]](readers, writers, arrayWriter, { Unit => 
-    	rand.nextInt(200001)
+    	rand.nextInt(20001)
 //    1
   })
 

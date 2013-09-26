@@ -9,35 +9,21 @@ import java.io.InputStream
 import java.io.OutputStream
 import de.ruedigermoeller.serialization.FSTConfiguration
 import com.despegar.soffheap.ProviderMappingInfo
+import com.despegar.soffheap.serialization.SerializerFactory
 
-class FSTSerializer[T: ClassTag] extends Serializer[T] with Metrics  {
+class FSTSerializer[T](hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics  {
 
   private[this] val serializeTimer = metrics.timer("serialize")
   private[this] val deserializeTimer = metrics.timer("deserialize")
 
-  override def serialize(anObject: T): Array[Byte] = serializeTimer.time {
-    val stream = new ByteArrayOutputStream()
-    FastSerializer.mywriteMethod[T](stream, anObject)
-    stream.toByteArray
-  }
-
-  override def deserialize(bytes: Array[Byte]): T = {
-//    deserializeTimer.time {
-    val stream = new ByteArrayInputStream(bytes)
-    FastSerializer.myreadMethod[T](stream)
-  }
-}
-
-object FastSerializer {
-
   System.setProperty("fst.unsafe","true")
-
+  
   val conf = FSTConfiguration.createDefaultConfiguration()
   
   conf.setPreferSpeed(true)
   conf.setShareReferences(false)
   conf.setCrossLanguage(false)
-  conf.getClassRegistry().registerClass(classOf[ProviderMappingInfo])
+  hintedClasses.foreach( hintedClass => conf.getClassRegistry().registerClass(hintedClass))
 
   def myreadMethod[T](stream:InputStream):T = {
     val in = conf.getObjectInput(stream);
@@ -53,5 +39,24 @@ object FastSerializer {
     // DON'T out.close();
     out.flush();
     stream.close();
+  }
+  
+  override def serialize(anObject: T): Array[Byte] = serializeTimer.time {
+    val stream = new ByteArrayOutputStream()
+    mywriteMethod[T](stream, anObject)
+    stream.toByteArray
+  }
+
+  override def deserialize(bytes: Array[Byte]): T = {
+//    deserializeTimer.time {
+    val stream = new ByteArrayInputStream(bytes)
+    myreadMethod[T](stream)
+  }
+}
+
+class FSTSerializerFactory extends SerializerFactory {
+  
+  override def create[T](hintedClasses: List[Class[_]]) = {
+     new FSTSerializer[T](hintedClasses)
   }
 }

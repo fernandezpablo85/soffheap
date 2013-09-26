@@ -7,3 +7,8 @@ trait Serializer[T] {
   def deserialize(bytes: Array[Byte]): T
   
 }
+
+trait SerializerFactory {
+  
+  def create[T](hintedClasses: List[Class[_]]): Serializer[T]
+}
