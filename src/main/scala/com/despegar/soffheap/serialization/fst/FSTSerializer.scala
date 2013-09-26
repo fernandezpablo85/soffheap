@@ -21,7 +21,8 @@ class FSTSerializer[T: ClassTag] extends Serializer[T] with Metrics  {
     stream.toByteArray
   }
 
-  override def deserialize(bytes: Array[Byte]): T = deserializeTimer.time {
+  override def deserialize(bytes: Array[Byte]): T = {
+//    deserializeTimer.time {
     val stream = new ByteArrayInputStream(bytes)
     FastSerializer.myreadMethod[T](stream)
   }
@@ -36,7 +37,7 @@ object FastSerializer {
   conf.setPreferSpeed(true)
   conf.setShareReferences(false)
   conf.setCrossLanguage(false)
-//  conf.getClassRegistry().registerClass(classOf[ProviderMappingInfo])
+  conf.getClassRegistry().registerClass(classOf[ProviderMappingInfo])
 
   def myreadMethod[T](stream:InputStream):T = {
     val in = conf.getObjectInput(stream);

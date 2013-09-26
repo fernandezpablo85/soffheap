@@ -6,7 +6,7 @@ import java.util.concurrent.Executors
 
 class ReadersWriterScenario[Key, Value: ClassTag](readers: Int, writers: Int, valueFactory: (Unit => Value), keyFactory: (Unit => Key)) {
 
-  val snapshot = new SoffHeapMapBuilder[Key,Value]().withMaximumHeapElements(1000).build()
+  val snapshot = new SoffHeapMapBuilder[Key,Value]().build()
   val readersExecutor = Executors.newFixedThreadPool(readers)
   val writersExecutor = Executors.newFixedThreadPool(writers)
 

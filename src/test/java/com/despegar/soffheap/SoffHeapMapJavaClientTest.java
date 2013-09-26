@@ -24,4 +24,19 @@ public class SoffHeapMapJavaClientTest {
 		assertEquals(1l, pojoValueInSnapshot.someLong.longValue());
 	}
 	
+	@Test
+	public void shouldCreateSoffHeapMapWithoutHeapCache() {
+
+		SoffHeapMap<String, PojoValue> soffheapMap = SoffHeapMapBuilder.newBuilder()
+															.withValueClass(PojoValue.class)
+															.build();
+
+		soffheapMap.put("key1", new PojoValue("value1",1l));
+
+		PojoValue pojoValueInSnapshot = soffheapMap.get("key1");
+
+		assertEquals("value1", pojoValueInSnapshot.someString);
+		assertEquals(1l, pojoValueInSnapshot.someLong.longValue());
+	}
+	
 }

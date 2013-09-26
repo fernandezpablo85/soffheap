@@ -49,10 +49,10 @@ trait SoffHeapMetrics extends Heap with Metrics {
   }
 
   abstract override def get(address: Long, buffer: Array[Byte])= {
-    getTime.time {
-    	readBytes.inc(toKB(buffer.length))
+//    getTime.time {
+//    	readBytes.inc(toKB(buffer.length))
       unsafe.copyMemory(null, address, buffer, ByteArrayOffset, buffer.length)
-    }
+//    }
   }
 
   private[this] def calculateRemainingOffMemory():Long = {

@@ -36,3 +36,9 @@ object Metrics {
   reporter.start()
 
 }
+
+object JMetrics {
+   def getMetrics() = {
+     Metrics.metrics
+   }
+}

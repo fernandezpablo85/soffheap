@@ -1,3 +1,4 @@
+
 package com.despegar.soffheap
 
 import com.despegar.soffheap.serialization.Serializer
@@ -21,7 +22,8 @@ class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializ
     SoffHeap.put(address,serialized)
   }
 
-  def get() = materializeTimer.time {
+  def get() = {
+//    materializeTimer.time {
 	val buffer = new Array[Byte](length) 
     SoffHeap.get(address,buffer)
     serializer.deserialize(buffer)

@@ -1,15 +1,14 @@
 package com.despegar.soffheap.map
 
-import com.despegar.soffheap.heapcache.{CacheFactory, HeapCache}
-
+import com.despegar.soffheap.heapcache.{CacheFactory, HeapCache, NoHeapCache}
 import scala.reflect.ClassTag
 
 class SoffHeapMapBuilder[K, V: ClassTag] {
 
-  private var theElements:Option[Int] = None
+  private var maxHeapElements:Option[Int] = None
 
   def withMaximumHeapElements(elements: Int) = {
-    theElements = Some(elements)
+    maxHeapElements = Some(elements)
     SoffHeapMapBuilder.this
   }
 
@@ -19,8 +18,13 @@ class SoffHeapMapBuilder[K, V: ClassTag] {
   }
 
   def build() = {
-    implicit val cache: HeapCache[K, V] = CacheFactory.create(theElements.getOrElse(100).toLong)
+    implicit val cache: HeapCache[K, V] = createHeapCache()
     new SoffHeapMap[K,V]()
+  }
+  
+  private def createHeapCache(): HeapCache[K, V] = {
+     if (maxHeapElements.isDefined && maxHeapElements.get > 0) CacheFactory.create(maxHeapElements.get.toLong)
+     else new NoHeapCache[K, V]()
   }
   
   

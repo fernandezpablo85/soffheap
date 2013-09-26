@@ -5,9 +5,9 @@ import com.google.common.cache.CacheBuilder;
 
 public class CacheFactory {
 
-	public static <Key,Value> HeapCache<Key, Value> create(Long maximunSize) {
+	public static <Key,Value> GoogleHeapCache<Key, Value> create(Long maximunSize) {
 		Cache<Key, Value> cache = CacheBuilder.newBuilder().maximumSize(maximunSize).build();
-		return new HeapCache<Key,Value>(cache);
+		return new GoogleHeapCache<Key,Value>(cache);
 	}
 
 }

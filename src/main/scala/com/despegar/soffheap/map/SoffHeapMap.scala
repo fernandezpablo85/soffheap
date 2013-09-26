@@ -15,14 +15,11 @@ import scala.collection.parallel.ThreadPoolTaskSupport
 import java.util.concurrent.ThreadPoolExecutor
 import com.despegar.soffheap.serialization.fst.FSTSerializer
 
-class SoffHeapMap[Key, Value: ClassTag]( implicit cache: HeapCache[Key, Value]) extends Metrics {
+class SoffHeapMap[Key, Value: ClassTag]( implicit heapCache: HeapCache[Key, Value]) extends Metrics {
 
   private[this] val multiGetTimer = metrics.timer("multiGet")
-  private[this] val cacheHits = metrics.counter("cacheHits")
-  private[this] val cacheMisses = metrics.counter("cacheMisses")
   val snapshot: Map[Key, AtomicReference[OffheapReference[Value]]] = new ConcurrentHashMap[Key, AtomicReference[OffheapReference[Value]]]()
   implicit val serializer = new FSTSerializer[Value]
-  //  val taskSupport = new ThreadPoolTaskSupport()
 
   def put(key: Key, value: Value): Unit = {
     if (snapshot.contains(key)) {
@@ -30,7 +27,7 @@ class SoffHeapMap[Key, Value: ClassTag]( implicit cache: HeapCache[Key, Value]) 
       if (option.isDefined) {
         val oldReference = option.get.getAndSet(new OffheapReference(value))
         oldReference.unreference()
-        cache.invalidate(key)
+        heapCache.invalidate(key)
       }
     } else {
       snapshot.put(key, new AtomicReference[OffheapReference[Value]](new OffheapReference[Value](value)))
@@ -55,12 +52,8 @@ class SoffHeapMap[Key, Value: ClassTag]( implicit cache: HeapCache[Key, Value]) 
   }
 
   def get(key: Key): Option[Value] = {
-//    val cachedValue = cache.get(key)
-//    if (cachedValue != null) {
-//      cacheHits.inc(1)
-//      return Some(cachedValue)
-//    }
-//    cacheMisses.inc(1)
+    val cachedValue = heapCache.get(key)
+    if (cachedValue != null) return Some(cachedValue)
     while (true) {
       val option = snapshot.get(key)
       if (!option.isDefined) return None
@@ -68,7 +61,7 @@ class SoffHeapMap[Key, Value: ClassTag]( implicit cache: HeapCache[Key, Value]) 
       if (offheapReference.reference()) {
         try {
           val value = offheapReference.get()
-          cache.put(key, value)
+          heapCache.put(key, value)
           return Some(value)
         } catch { case e: Throwable => e.printStackTrace() }
         finally {
@@ -81,18 +74,10 @@ class SoffHeapMap[Key, Value: ClassTag]( implicit cache: HeapCache[Key, Value]) 
   }
 
   def multiGet(keys: List[Key]): Seq[Value] = multiGetTimer.time {
-    //    val parallelKeys = keys.par
-    //    val split = keys.splitAt(keys.size / 2)
-    //    val splitZipped = split.
-    //    parallelKeys.tasksupport = taskSupport
     keys.map { key => get(key) }.flatMap { option => option }
   }
   
    def jmultiGet(keys: java.util.List[Key]): java.util.List[Value] = multiGetTimer.time {
-    //    val parallelKeys = keys.par
-    //    val split = keys.splitAt(keys.size / 2)
-    //    val splitZipped = split.
-    //    parallelKeys.tasksupport = taskSupport
     keys.map { key => get(key) }.flatMap { option => option }
   }
 
