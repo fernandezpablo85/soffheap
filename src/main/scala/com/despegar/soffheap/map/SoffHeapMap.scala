@@ -1,6 +1,5 @@
 package com.despegar.soffheap.map
 
-import scala.collection.mutable.Map
 import java.util.concurrent.atomic.AtomicReference
 import com.despegar.soffheap.serialization.kryo.KryoSerializer
 import scala.collection.Iterable
@@ -17,43 +16,30 @@ import com.despegar.soffheap.serialization.fst.FSTSerializer
 import com.despegar.soffheap.serialization.Serializer
 import java.util.ArrayList
 import scala.collection.concurrent.TrieMap
+import java.util.HashMap
 
-class SoffHeapMap[Key, Value]( implicit heapCache: HeapCache[Key, Value], serializer: Serializer[Value]) extends Metrics {
+class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], serializer: Serializer[Value]) extends Metrics {
 
   private[this] val multiGetTimer = metrics.timer("multiGet")
-  val map: Map[Key, AtomicReference[OffheapReference[Value]]] = TrieMap[Key, AtomicReference[OffheapReference[Value]]]()
+  private[this] val getTimer = metrics.timer("get")
+  val map: TrieMap[Key, AtomicReference[OffheapReference[Value]]] = TrieMap[Key, AtomicReference[OffheapReference[Value]]]()
 
   def put(key: Key, value: Value): Unit = {
-    if (map.contains(key)) {
+    if (containsKey(key)) {
       val atomicReferenceOption = map.get(key)
-      if (atomicReferenceOption.isDefined) {
-        val oldReference = atomicReferenceOption.get.getAndSet(new OffheapReference(value))
-        oldReference.unreference()
-        heapCache.invalidate(key)
-      }
+      val oldReference = atomicReferenceOption.get.getAndSet(new OffheapReference[Value](value))
+      oldReference.unreference()
+      heapCache.invalidate(key)
     } else {
       map.put(key, new AtomicReference[OffheapReference[Value]](new OffheapReference[Value](value)))
     }
-  }
-  
-  def containsKey(key: Key) = {
-    map.contains(key)
-  }
-
-  def size() = {
-    map.size
-  }
-
-  def clear() = {
-    map.foreach { entry => entry._2.get().unreference }
-    map.clear()
   }
 
   def jget(key: Key): Value = {
     get(key).getOrElse(null.asInstanceOf[Value])
   }
 
-  def get(key: Key): Option[Value] = {
+  private def innerGet(key: Key): Option[Value] = {
     val cachedValue = heapCache.get(key)
     if (cachedValue != null) return Some(cachedValue)
     while (true) {
@@ -69,27 +55,28 @@ class SoffHeapMap[Key, Value]( implicit heapCache: HeapCache[Key, Value], serial
         finally {
           offheapReference.unreference()
         }
-
       }
     }
     None
   }
 
-  def multiGet(keys: List[Key]): Seq[Value] = multiGetTimer.time {
-    keys.map { key => get(key) }.flatten { option => option }
+  def get(key: Key): Option[Value] = getTimer.time {
+    innerGet(key)
   }
-  
-   def jmultiGet(keys: java.util.List[Key]): java.util.List[Value] = multiGetTimer.time {
-     val result:java.util.List[Value] = new ArrayList[Value]()
-     val iterator = keys.iterator()
-     while(iterator.hasNext()) {
-        val key = iterator.next()
-        val option = get(key)
-        if (option.isDefined) {
-          result.add(option.get)
-        }
-     }
-     result
+
+  def multiGet(keys: List[Key]): Map[Key, Option[Value]] = multiGetTimer.time {
+    keys.map { key => (key,innerGet(key)) }.toMap
+  }
+
+  def jmultiGet(keys: java.util.List[Key]): java.util.Map[Key, Value] = multiGetTimer.time {
+    val result: java.util.Map[Key, Value] = new HashMap[Key, Value]()
+    val iterator = keys.iterator()
+    while (iterator.hasNext()) {
+      val key = iterator.next()
+      val option = innerGet(key)
+      result.put(key, option.getOrElse(null.asInstanceOf[Value]))
+    }
+    result
   }
 
   def reload(map: Map[Key, Value]) = {
@@ -104,6 +91,19 @@ class SoffHeapMap[Key, Value]( implicit heapCache: HeapCache[Key, Value], serial
         tuple._1
     }
     removeNotIn(insertedKeys.toSeq)
+  }
+
+  def containsKey(key: Key) = {
+    map.contains(key)
+  }
+
+  def size() = {
+    map.size
+  }
+
+  def clear() = {
+    map.foreach { entry => entry._2.get().unreference }
+    map.clear()
   }
 
   private[this] def removeNotIn(iterable: Seq[Key]) = {

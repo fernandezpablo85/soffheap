@@ -10,10 +10,10 @@ class MultiGetReader[Key, Value](soffheapMap: SoffHeapMap[Key, Value], keyFactor
     	val keys = (1 to 1000) map { _ => keyFactory() }
         val list = soffheapMap.multiGet(keys.toList)
         if (!list.isEmpty) {
-           list(0)
+           list.size
         }
        } catch {
-         case e: Exception => e.printStackTrace()
+         case e: Throwable => e.printStackTrace()
        }
      }
   }

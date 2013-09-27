@@ -6,7 +6,11 @@ class Writer[Key, Value](snapshot: SoffHeapMap[Key, Value], keyFactory: Unit => 
 
   override def run() = {
      while(!Thread.interrupted()) {
-        snapshot.put(keyFactory(), valueFactory())
+       try {
+    	   snapshot.put(keyFactory(), valueFactory())
+       } catch {
+         case e: Throwable => e.printStackTrace()
+       }
      }
   }
   

@@ -1,6 +1,7 @@
 package com.despegar.soffheap.map.j;
 
 import java.util.List;
+import java.util.Map;
 
 import com.despegar.soffheap.map.SoffHeapMap;
 
@@ -18,7 +19,7 @@ public class SoffHeapMapImpl<Key, Value> implements com.despegar.soffheap.map.j.
 	}
 
 	@Override
-	public List<Value> multiGet(List<Key> keys) {
+	public Map<Key, Value> multiGet(List<Key> keys) {
 		return offheapMapSnapshot.jmultiGet(keys);
 	}
 

@@ -7,7 +7,6 @@ trait Heap {
 
   val unsafe = Unsafe.instance
   val ByteArrayOffset = unsafe.arrayBaseOffset(classOf[Array[Byte]])
-  val allocatedBytes = new AtomicLong(0)
 
   def allocate(bytes: Long):Long
 

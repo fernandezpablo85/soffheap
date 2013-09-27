@@ -8,7 +8,6 @@ import com.despegar.soffheap.metrics.SoffHeapMetrics
 trait SoffHeap extends Heap {
 
   def allocate(bytes: Long):Long = {
-    allocatedBytes.addAndGet(bytes)
     unsafe.allocateMemory(bytes)
   }
 

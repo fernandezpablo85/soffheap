@@ -1,6 +1,8 @@
 package com.despegar.soffheap.metrics
 
 import com.despegar.soffheap.Heap
+import com.despegar.soffheap.jmx.JmxConverters._
+
 
 trait SoffHeapMetrics extends Heap with Metrics {
 
@@ -49,10 +51,10 @@ trait SoffHeapMetrics extends Heap with Metrics {
   }
 
   abstract override def get(address: Long, buffer: Array[Byte])= {
-//    getTime.time {
-//    	readBytes.inc(toKB(buffer.length))
-      unsafe.copyMemory(null, address, buffer, ByteArrayOffset, buffer.length)
-//    }
+    getTime.time {
+    	readBytes.inc(buffer.length)
+    	super.get(address, buffer)
+    }
   }
 
   private[this] def calculateRemainingOffMemory():Long = {
