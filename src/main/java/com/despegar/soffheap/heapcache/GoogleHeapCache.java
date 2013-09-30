@@ -6,7 +6,8 @@ public class GoogleHeapCache<Key, Value> extends AbstractHeapMap<Key, Value>{
 
 	private final Cache<Key, Value> cache;
 
-	public GoogleHeapCache(Cache<Key, Value> cache) {
+	public GoogleHeapCache(String name, Cache<Key, Value> cache) {
+        super(name);
 		this.cache = cache;
 	}
 

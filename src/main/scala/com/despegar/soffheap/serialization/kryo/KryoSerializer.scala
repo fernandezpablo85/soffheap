@@ -1,7 +1,6 @@
 package com.despegar.soffheap.serialization.kryo
 
 import com.esotericsoftware.kryo.Kryo
-import scala.reflect._
 import com.despegar.soffheap.serialization.Serializer
 import com.despegar.soffheap.metrics.Metrics
 import java.io.ByteArrayOutputStream
@@ -10,10 +9,10 @@ import com.esotericsoftware.kryo.io.UnsafeInput
 import java.util.concurrent.ConcurrentLinkedQueue
 import com.despegar.soffheap.serialization.SerializerFactory
 
-class KryoSerializer[T](hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics {
+class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics {
 
-  private[this] val serializeTimer = metrics.timer("serialize")
-  private[this] val deserializeTimer = metrics.timer("deserialize")
+  private[this] val serializeTimer = metrics.timer(s"${metricsPrefix}serialize")
+  private[this] val deserializeTimer = metrics.timer(s"${metricsPrefix}deserialize")
 
   val kryoFactory = new Factory[Kryo] {
     def newInstance(): Kryo = {
@@ -59,6 +58,7 @@ class KryoSerializer[T](hintedClasses: List[Class[_]] = List.empty) extends Seri
     }
   }
 
+  def metricsPrefix: String = name
 }
 
 trait Factory[T] {
@@ -92,7 +92,7 @@ class KryoPool(factory: Factory[Kryo], kryoInstances: Int) {
 
 class KryoSerializerFactory extends SerializerFactory {
   
-  override def create[T](hintedClasses: List[Class[_]]) = {
-     new KryoSerializer[T](hintedClasses)
+  override def create[T](name:String, hintedClasses: List[Class[_]]) = {
+     new KryoSerializer[T](name, hintedClasses)
   }
 }

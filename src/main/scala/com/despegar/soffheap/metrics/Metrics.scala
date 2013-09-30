@@ -1,11 +1,14 @@
 package com.despegar.soffheap.metrics
 
-import com.codahale.metrics.{JmxReporter, MetricRegistry}
+import com.codahale.metrics.MetricRegistry
 import java.util.concurrent.TimeUnit
 import nl.grons.metrics.scala.InstrumentedBuilder
 import com.codahale.metrics.JmxReporter
 
 trait Metrics extends InstrumentedBuilder {
+
+  def metricsPrefix:String
+
   val metricRegistry = Metrics.metrics
 
   val K:Long = 1024
@@ -24,10 +27,10 @@ trait Metrics extends InstrumentedBuilder {
       case Some(amount) => toGB(amount.toLong)
     }
   }
-
 }
 
 object Metrics {
+
   val metrics = new MetricRegistry()
 
   val reporter = JmxReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS)
@@ -38,7 +41,8 @@ object Metrics {
 }
 
 object JMetrics {
-   def getMetrics() = {
+
+  def getMetrics() = {
      Metrics.metrics
    }
 }

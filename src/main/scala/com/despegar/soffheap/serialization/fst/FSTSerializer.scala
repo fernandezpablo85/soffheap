@@ -1,6 +1,5 @@
 package com.despegar.soffheap.serialization.fst
 
-import scala.reflect.ClassTag
 import com.despegar.soffheap.serialization.Serializer
 import com.despegar.soffheap.metrics.Metrics
 import java.io.ByteArrayOutputStream
@@ -8,13 +7,12 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
 import de.ruedigermoeller.serialization.FSTConfiguration
-import com.despegar.soffheap.ProviderMappingInfo
 import com.despegar.soffheap.serialization.SerializerFactory
 
-class FSTSerializer[T](hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics  {
+class FSTSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics  {
 
-  private[this] val serializeTimer = metrics.timer("serialize")
-  private[this] val deserializeTimer = metrics.timer("deserialize")
+  private[this] val serializeTimer = metrics.timer(s"${metricsPrefix}serialize")
+  private[this] val deserializeTimer = metrics.timer(s"${metricsPrefix}deserialize")
 
   System.setProperty("fst.unsafe","true")
   
@@ -52,11 +50,13 @@ class FSTSerializer[T](hintedClasses: List[Class[_]] = List.empty) extends Seria
     val stream = new ByteArrayInputStream(bytes)
     myreadMethod[T](stream)
   }
+
+  def metricsPrefix: String = name
 }
 
 class FSTSerializerFactory extends SerializerFactory {
   
-  override def create[T](hintedClasses: List[Class[_]]) = {
-     new FSTSerializer[T](hintedClasses)
+  override def create[T](name:String, hintedClasses: List[Class[_]]) = {
+     new FSTSerializer[T](name, hintedClasses)
   }
 }

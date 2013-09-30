@@ -53,4 +53,6 @@ object SoffHeap extends SoffHeap with SoffHeapMetrics {
   def sizeOf(o: Any): Long = {
     sizeOf(o.getClass())
   }
+
+  def metricsPrefix: String = "SoffHeap"
 }

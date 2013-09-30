@@ -2,7 +2,11 @@ package com.despegar.soffheap.heapcache;
 
 public class NoHeapCache<Key, Value> extends AbstractHeapMap<Key, Value>{
 
-	@Override
+    public NoHeapCache(String name) {
+        super(name);
+    }
+
+    @Override
 	public Value get(Key key) {
 		return null;
 	}

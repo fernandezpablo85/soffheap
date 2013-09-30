@@ -1,27 +1,19 @@
 package com.despegar.soffheap.map
 
 import java.util.concurrent.atomic.AtomicReference
-import com.despegar.soffheap.serialization.kryo.KryoSerializer
 import scala.collection.Iterable
-import java.util.concurrent.ConcurrentHashMap
-import scala.collection.JavaConverters._
-import com.despegar.soffheap.metrics.Metrics
+import com.despegar.soffheap.metrics.{Metrics}
 import com.despegar.soffheap.heapcache.HeapCache
 import com.despegar.soffheap.OffheapReference
-import scala.reflect.ClassTag
-import java.util.concurrent.Executors
-import scala.collection.parallel.ThreadPoolTaskSupport
-import java.util.concurrent.ThreadPoolExecutor
-import com.despegar.soffheap.serialization.fst.FSTSerializer
 import com.despegar.soffheap.serialization.Serializer
-import java.util.ArrayList
 import scala.collection.concurrent.TrieMap
 import java.util.HashMap
 
 class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], serializer: Serializer[Value]) extends Metrics {
 
-  private[this] val multiGetTimer = metrics.timer("multiGet")
-  private[this] val getTimer = metrics.timer("get")
+  private[this] val multiGetTimer = metrics.timer(s"${metricsPrefix}-multiGet")
+  private[this] val getTimer = metrics.timer(s"${metricsPrefix}-get")
+
   val map: TrieMap[Key, AtomicReference[OffheapReference[Value]]] = TrieMap[Key, AtomicReference[OffheapReference[Value]]]()
 
   def put(key: Key, value: Value): Unit = {
@@ -118,4 +110,5 @@ class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], seriali
     }
   }
 
+  def metricsPrefix: String = "SoffHeapMap"
 }

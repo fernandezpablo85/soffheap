@@ -10,5 +10,5 @@ trait Serializer[T] {
 
 trait SerializerFactory {
   
-  def create[T](hintedClasses: List[Class[_]]): Serializer[T]
+  def create[T](name:String, hintedClasses: List[Class[_]]): Serializer[T]
 }

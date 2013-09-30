@@ -5,16 +5,22 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.despegar.soffheap.metrics.JMetrics;
 
-public abstract class AbstractHeapMap<Key,Value> implements HeapCache<Key,Value>{
+import static java.text.MessageFormat.format;
 
-	protected MetricRegistry registry = JMetrics.getMetrics();
-	protected Counter hitsCounter = registry.counter(HeapCache.class.getName()+".hits");
-	protected Counter missesCounter = registry.counter(HeapCache.class.getName()+".misses");
-	protected Counter invalidatesCounter = registry.counter(HeapCache.class.getName()+".invalidates");
+public abstract class AbstractHeapMap<Key,Value> implements HeapCache<Key,Value>{
+    protected final MetricRegistry registry;
+	protected final Counter hitsCounter;
+    protected final Counter missesCounter;
+    protected final Counter invalidatesCounter;
 
 	
-	public AbstractHeapMap() {
-		String hitratio = HeapCache.class.getName()+".hitRatio";
+	public AbstractHeapMap(String name) {
+        registry = JMetrics.getMetrics();
+        hitsCounter = registry.counter(format("{0}{1}hits", HeapCache.class.getName(), name));
+        missesCounter = registry.counter(format("{0}{1}misses", HeapCache.class.getName(), name));
+        invalidatesCounter = registry.counter(format("{0}{1}invalidates", HeapCache.class.getName(), name));
+
+        String hitratio = format("{0}{1}hitRatio", HeapCache.class.getName(), name);
 		if (registry.getGauges().get(hitratio) != null) {
 			registry.register(hitratio,  new Gauge<Double>() {
 				@Override
@@ -27,6 +33,5 @@ public abstract class AbstractHeapMap<Key,Value> implements HeapCache<Key,Value>
 
 			});
 		}
-	}
-	
+    }
 }

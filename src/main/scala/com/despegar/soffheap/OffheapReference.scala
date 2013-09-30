@@ -1,14 +1,11 @@
 
 package com.despegar.soffheap
 
-import com.despegar.soffheap.serialization.Serializer
 import java.util.concurrent.atomic.AtomicInteger
-import com.despegar.soffheap.metrics.Metrics
 import com.despegar.soffheap.serialization.Serializer
 
-class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializer: Serializer[HeapObject]) extends Metrics {
+class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializer: Serializer[HeapObject]) {
 
-  private [this] val materializeTimer = metrics.timer("materialize")
   val referenceCount = new AtomicInteger(1)
   doSerialization(heapObject)
   var address: Long = _

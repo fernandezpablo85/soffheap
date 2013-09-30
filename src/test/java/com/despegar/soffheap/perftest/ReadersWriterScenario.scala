@@ -7,7 +7,7 @@ import com.despegar.soffheap.ProviderMappingInfo
 
 class ReadersWriterScenario[Key, Value](readers: Int, writers: Int, valueFactory: (Unit => Value), keyFactory: (Unit => Key)) {
 
-  val soffheapMap = SoffHeapMapBuilder.of[Key,Value]().withKryo.build()
+  val soffheapMap = SoffHeapMapBuilder.of[Key,Value]().withKryo.withName("offHeap1").build()
   val readersExecutor = Executors.newFixedThreadPool(readers)
   val writersExecutor = Executors.newFixedThreadPool(writers)
 
