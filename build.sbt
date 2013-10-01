@@ -14,11 +14,11 @@ fork in run := true
 
 publishMavenStyle := true
 
-resolvers += "Nexus" at "http://nexus.despegar.it:8080/nexus/content/groups/proxies"
+resolvers += "Nexus resolver" at "http://nexus.despegar.it/nexus/content/groups/proxies"
 
 crossPaths := false
 
-publishTo := Some("Nexus" at "http://nexus.despegar.it/nexus/content/repositories/releases")
+publishTo := Some("Nexus releases" at "http://nexus.despegar.it/nexus/content/repositories/releases")
     
 libraryDependencies ++= Seq(
     "com.esotericsoftware.kryo"     %  "kryo"           % "2.22",
