@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.io.UnsafeOutput
 import com.esotericsoftware.kryo.io.UnsafeInput
 import java.util.concurrent.ConcurrentLinkedQueue
 import com.despegar.soffheap.serialization.SerializerFactory
+import com.despegar.soffheap.LongAdder
 
 class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics {
 
@@ -23,7 +24,7 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
     }
   }
 
-  val pool = new KryoPool(kryoFactory, 10)
+  val pool = new KryoPool(name, kryoFactory, 10)
 
   override def serialize(anObject: T): Array[Byte] = serializeTimer.time {
     val kryoHolder = pool.take()
@@ -36,8 +37,6 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
       val bytes = outputStream.toByteArray()
       output.close()
       bytes
-    } catch {
-      case e: Exception => e.printStackTrace(); throw new RuntimeException(e)
     } finally {
       pool.release(kryoHolder)
     }
@@ -51,9 +50,7 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
       val input = new UnsafeInput(bytes)
       val deserializedObject = kryo.readClassAndObject(input).asInstanceOf[T]
       deserializedObject
-    } catch {
-      case e: Exception => e.printStackTrace(); throw new RuntimeException(e)
-    } finally {
+    }  finally {
       pool.release(kryoHolder)
     }
   }
@@ -64,28 +61,39 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
 trait Factory[T] {
   def newInstance(): T
 }
-
-class KryoPool(factory: Factory[Kryo], kryoInstances: Int) {
-
+ 
+class KryoPool(name: String, factory: Factory[Kryo], initInstances: Int) extends Metrics {
+  val instances = new LongAdder()
+  instances.add(initInstances)
+  val maxInstances = initInstances * 2
   val objects = new ConcurrentLinkedQueue[Kryo]();
+  val kryoInstancesGauge = metrics.gauge(s"${name}kryoInstances") {
+     instances.intValue()
+  }
 
-  (1 to kryoInstances) foreach { _ =>  objects.offer(factory.newInstance())}
+  (1 to initInstances) foreach { _ =>  objects.offer(factory.newInstance())}
   
   def take(): Kryo = {
     val pooledKryo = objects.poll()
     if (pooledKryo == null) {
       return factory.newInstance()
     }
+    instances.decrement()
     return pooledKryo
   }
 
   def release(kh: Kryo) = {
-    objects.offer(kh)
+    if (instances.intValue() < maxInstances) {
+      instances.increment()
+      objects.offer(kh)
+    }
   }
 
   def close() = {
     objects.clear()
   }
+  
+  override def metricsPrefix = name
 
 }
 
@@ -96,3 +104,4 @@ class KryoSerializerFactory extends SerializerFactory {
      new KryoSerializer[T](name, hintedClasses)
   }
 }
+

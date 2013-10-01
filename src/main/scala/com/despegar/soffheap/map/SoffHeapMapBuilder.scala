@@ -47,12 +47,12 @@ class SoffHeapMapBuilder[K, V] {
   }
 
   def build() = {
-    val name = s"${soffHeapName.getOrElse(UUID.randomUUID().toString)}-"
+    val name = s"${soffHeapName.getOrElse(UUID.randomUUID().toString)}."
 
     implicit val cache: HeapCache[K, V] = createHeapCache(name)
     implicit val serializerOfV: Serializer[V] = createSerializer(name)
 
-    new SoffHeapMap[K,V]()
+    new SoffHeapMap[K,V](name)
   }
   
   def createSerializer(name:String): Serializer[V] = {

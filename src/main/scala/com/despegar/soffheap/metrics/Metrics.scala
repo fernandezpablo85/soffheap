@@ -33,7 +33,7 @@ object Metrics {
 
   val metrics = new MetricRegistry()
 
-  val reporter = JmxReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS)
+  val reporter = JmxReporter.forRegistry(metrics).inDomain("SoffHeap").convertRatesTo(TimeUnit.SECONDS)
                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                             .build()
   reporter.start()

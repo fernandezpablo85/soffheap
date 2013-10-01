@@ -12,8 +12,6 @@ fork in run := true
 
 publishMavenStyle := true
 
-publishTo := Some ( Resolver .file( "file" , new File ( Path .userHome.absolutePath+ "/.m2/repository" )))
-
 resolvers += "Nexus" at "http://nexus.despegar.it:8080/nexus/content/groups/proxies"
 
 crossPaths := false
@@ -31,4 +29,4 @@ libraryDependencies ++= Seq(
 
 EclipseKeys.withSource := true
 
-
+releaseSettings

@@ -16,11 +16,11 @@ public abstract class AbstractHeapMap<Key,Value> implements HeapCache<Key,Value>
 	
 	public AbstractHeapMap(String name) {
         registry = JMetrics.getMetrics();
-        hitsCounter = registry.counter(format("{0}{1}hits", HeapCache.class.getName(), name));
-        missesCounter = registry.counter(format("{0}{1}misses", HeapCache.class.getName(), name));
-        invalidatesCounter = registry.counter(format("{0}{1}invalidates", HeapCache.class.getName(), name));
+        hitsCounter = registry.counter(format("{0}.{1}hits", HeapCache.class.getName(), name));
+        missesCounter = registry.counter(format("{0}.{1}misses", HeapCache.class.getName(), name));
+        invalidatesCounter = registry.counter(format("{0}.{1}invalidates", HeapCache.class.getName(), name));
 
-        String hitratio = format("{0}{1}hitRatio", HeapCache.class.getName(), name);
+        String hitratio = format("{0}.{1}hitRatio", HeapCache.class.getName(), name);
 		if (registry.getGauges().get(hitratio) != null) {
 			registry.register(hitratio,  new Gauge<Double>() {
 				@Override

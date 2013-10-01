@@ -2,29 +2,34 @@ package com.despegar.soffheap.map
 
 import java.util.concurrent.atomic.AtomicReference
 import scala.collection.Iterable
-import com.despegar.soffheap.metrics.{Metrics}
+import com.despegar.soffheap.metrics.{ Metrics }
 import com.despegar.soffheap.heapcache.HeapCache
 import com.despegar.soffheap.OffheapReference
 import com.despegar.soffheap.serialization.Serializer
+import scala.collection.JavaConverters._
 import scala.collection.concurrent.TrieMap
 import java.util.HashMap
+import java.util.concurrent.ConcurrentHashMap
 
-class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], serializer: Serializer[Value]) extends Metrics {
+class SoffHeapMap[Key, Value](name: String)(implicit heapCache: HeapCache[Key, Value], serializer: Serializer[Value]) extends Metrics {
 
-  private[this] val multiGetTimer = metrics.timer(s"${metricsPrefix}-multiGet")
-  private[this] val getTimer = metrics.timer(s"${metricsPrefix}-get")
+  private[this] val multiGetTimer = metrics.timer(s"${metricsPrefix}multiGet")
+  private[this] val getTimer = metrics.timer(s"${metricsPrefix}get")
 
-  val map: TrieMap[Key, AtomicReference[OffheapReference[Value]]] = TrieMap[Key, AtomicReference[OffheapReference[Value]]]()
+  val map: ConcurrentHashMap[Key, OffheapReference[Value]] = new ConcurrentHashMap[Key, OffheapReference[Value]]()
 
   def put(key: Key, value: Value): Unit = {
-    if (containsKey(key)) {
-      val atomicReferenceOption = map.get(key)
-      val oldReference = atomicReferenceOption.get.getAndSet(new OffheapReference[Value](value))
+    val soffheapRef = asSoffHeapReference(value)
+    val oldReference = map.putIfAbsent(key, soffheapRef)
+    if (oldReference != null) {
+      map.put(key, soffheapRef)
       oldReference.unreference()
       heapCache.invalidate(key)
-    } else {
-      map.put(key, new AtomicReference[OffheapReference[Value]](new OffheapReference[Value](value)))
     }
+  }
+
+  private def asSoffHeapReference(value: Value) = {
+    new OffheapReference[Value](value)
   }
 
   def jget(key: Key): Value = {
@@ -35,17 +40,16 @@ class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], seriali
     val cachedValue = heapCache.get(key)
     if (cachedValue != null) return Some(cachedValue)
     while (true) {
-      val atomicReferenceOption = map.get(key)
-      if (!atomicReferenceOption.isDefined) return None
-      val offheapReference = atomicReferenceOption.get.get()
-      if (offheapReference.reference()) {
+      val soffheapRef = map.get(key)
+      if (soffheapRef == null) return None
+      if (soffheapRef.reference()) {
         try {
-          val value = offheapReference.get()
+          val value = soffheapRef.get()
           heapCache.put(key, value)
           return Some(value)
-        } catch { case e: Throwable => e.printStackTrace() }
+        }
         finally {
-          offheapReference.unreference()
+          soffheapRef.unreference()
         }
       }
     }
@@ -57,7 +61,7 @@ class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], seriali
   }
 
   def multiGet(keys: List[Key]): Map[Key, Option[Value]] = multiGetTimer.time {
-    keys.map { key => (key,innerGet(key)) }.toMap
+    keys.map { key => (key, innerGet(key)) }.toMap
   }
 
   def jmultiGet(keys: java.util.List[Key]): java.util.Map[Key, Value] = multiGetTimer.time {
@@ -94,21 +98,25 @@ class SoffHeapMap[Key, Value](implicit heapCache: HeapCache[Key, Value], seriali
   }
 
   def clear() = {
-    map.foreach { entry => entry._2.get().unreference }
+    map.asScala.foreach { entry => entry._2.unreference }
     map.clear()
   }
 
   private[this] def removeNotIn(iterable: Seq[Key]) = {
-    map.keySet.filterNot(key => iterable.contains(key)).foreach(key => remove(key))
+    map.asScala.keySet.filterNot(key => iterable.contains(key)).foreach(key => remove(key))
   }
 
   private[this] def remove(key: Key) = {
-    val atomicReferenceOption = map.get(key)
-    if (atomicReferenceOption.isDefined) {
-      atomicReferenceOption.get.get().unreference
+    val soffheapRef = map.get(key)
+    if (soffheapRef != null) {
+      soffheapRef.unreference
       map.remove(key)
     }
   }
 
-  def metricsPrefix: String = "SoffHeapMap"
+  def metricsPrefix: String = name
+
+  override def finalize() = {
+    clear()
+  }
 }

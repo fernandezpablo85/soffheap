@@ -50,10 +50,10 @@ trait SoffHeapMetrics extends Heap with Metrics {
   }
 
   abstract override def get(address: Long, buffer: Array[Byte])= {
-    getTime.time {
-    	readBytes.inc(buffer.length)
+//    getTime.time {
+//    	readBytes.inc(buffer.length)
     	super.get(address, buffer)
-    }
+//    }
   }
 
   private[this] def calculateRemainingOffMemory():Long = {
