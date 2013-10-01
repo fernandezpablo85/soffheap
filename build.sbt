@@ -4,6 +4,8 @@ organization := "com.despegar"
 
 name := "soffheap"
 
+version := "0.1.0-SNAPSHOT"
+
 // we need to add the runtime classpath as a "-cp" argument to the `javaOptions in run`, otherwise caliper
 // will not see the right classpath and die with a ConfigurationException
 javaOptions in run <++= (fullClasspath in Runtime) map { cp => Seq("-cp", sbt.Build.data(cp).mkString(":")) }
@@ -15,6 +17,8 @@ publishMavenStyle := true
 resolvers += "Nexus" at "http://nexus.despegar.it:8080/nexus/content/groups/proxies"
 
 crossPaths := false
+
+publishTo := Some("Nexus" at "http://nexus.despegar.it/nexus/content/repositories/releases")
     
 libraryDependencies ++= Seq(
     "com.esotericsoftware.kryo"     %  "kryo"           % "2.22",
