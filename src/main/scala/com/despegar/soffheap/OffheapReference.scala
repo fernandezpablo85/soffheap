@@ -20,7 +20,6 @@ class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializ
   }
 
   def get() = {
-//    materializeTimer.time {
 	val buffer = new Array[Byte](length) 
     SoffHeap.get(address,buffer)
     serializer.deserialize(buffer)
@@ -46,15 +45,5 @@ class OffheapReference[HeapObject](heapObject: HeapObject)(implicit val serializ
   def free() {
     SoffHeap.free(address, length)
   }
-
-
-  override def toString() = {
-    val sb = new StringBuilder()
-    sb.append("UnsafeOffHeapMemory")
-    sb.append("{address=").append(address)
-    sb.append(", length=").append(length)
-    sb.append('}')
-    sb.toString()
-  }
-
+  
 }

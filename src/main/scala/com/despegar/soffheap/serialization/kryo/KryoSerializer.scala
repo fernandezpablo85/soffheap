@@ -12,8 +12,8 @@ import com.despegar.soffheap.LongAdder
 
 class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics {
 
-  private[this] val serializeTimer = metrics.timer(s"${metricsPrefix}serialize")
-  private[this] val deserializeTimer = metrics.timer(s"${metricsPrefix}deserialize")
+  private[this] val serializeTimer = metrics.timer(s"${name}serialize")
+  private[this] val deserializeTimer = metrics.timer(s"${name}deserialize")
 
   val kryoFactory = new Factory[Kryo] {
     def newInstance(): Kryo = {
@@ -43,15 +43,13 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
   }
 
   override def deserialize(bytes: Array[Byte]): T = { 
-//    deserializeTimer.time {
-    val kryoHolder = pool.take()
+    val kryo = pool.take()
     try {
-      val kryo = kryoHolder
       val input = new UnsafeInput(bytes)
       val deserializedObject = kryo.readClassAndObject(input).asInstanceOf[T]
       deserializedObject
     }  finally {
-      pool.release(kryoHolder)
+      pool.release(kryo)
     }
   }
 

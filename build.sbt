@@ -20,13 +20,12 @@ publishTo := Some("Nexus releases" at "http://nexus.despegar.it:8080/nexus/conte
     
 libraryDependencies ++= Seq(
     "com.esotericsoftware.kryo"     %  "kryo"           % "2.22",
-    "nl.grons" %% "metrics-scala" % "3.0.2" excludeAll(ExclusionRule(organization = "com.typesafe.akka")),
+    "nl.grons" %% "metrics-scala" % "3.0.2" exclude("com.typesafe.akka","akka-actor"),
     "com.google.guava" % "guava" % "15.0",
-    "com.tzavellas" % "sse-jmx" % "0.4.1",
     "org.scalatest" % "scalatest_2.10" % "2.0.M6" % "test",
     "junit" % "junit" % "4.8.1" % "test",
-     "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0" % "test",
-     "com.google.code.gson" % "gson" % "1.7.1"  % "test"
+    "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0" % "test",
+    "com.google.code.gson" % "gson" % "1.7.1"  % "test"
 ) 
 
 EclipseKeys.withSource := true
