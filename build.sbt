@@ -20,7 +20,7 @@ publishTo := Some("Nexus releases" at "http://nexus.despegar.it:8080/nexus/conte
     
 libraryDependencies ++= Seq(
     "com.esotericsoftware.kryo"     %  "kryo"           % "2.22",
-    "nl.grons" %% "metrics-scala" % "3.0.2" exclude("com.typesafe.akka","akka-actor"),
+    "nl.grons" %% "metrics-scala" % "3.0.2" exclude("com.typesafe.akka","akka-actor_2.10"),
     "com.google.guava" % "guava" % "15.0",
     "org.scalatest" % "scalatest_2.10" % "2.0.M6" % "test",
     "junit" % "junit" % "4.8.1" % "test",
