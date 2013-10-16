@@ -65,11 +65,12 @@ class KryoPool(name: String, factory: Factory[Kryo], initInstances: Int) extends
   instances.add(initInstances)
   val maxInstances = initInstances * 2
   val objects = new ConcurrentLinkedQueue[Kryo]();
-  val kryoInstancesGauge = metrics.gauge(s"${name}kryoInstances") {
+  val kryoInstancesGauge = safeGauge(s"${name}kryoInstances") {
      instances.intValue()
   }
 
   (1 to initInstances) foreach { _ =>  objects.offer(factory.newInstance())}
+  
   
   def take(): Kryo = {
     val pooledKryo = objects.poll()

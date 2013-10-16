@@ -4,12 +4,26 @@ import com.codahale.metrics.MetricRegistry
 import java.util.concurrent.TimeUnit
 import nl.grons.metrics.scala.InstrumentedBuilder
 import com.codahale.metrics.JmxReporter
+import nl.grons.metrics.scala.Gauge
+import nl.grons.metrics.scala.MetricBuilder
+import com.codahale.metrics.{Gauge => CHGauge}
 
 trait Metrics extends InstrumentedBuilder {
 
   def metricsPrefix:String
 
   val metricRegistry = Metrics.metrics
+  
+  def safeGauge[A](name: String, scope: String = null)(f: => A): Gauge[A] = {
+    metricRegistry.synchronized {
+        val gaugeName = MetricBuilder.metricName(getClass, Seq(name, scope))
+    	var aGauge = metricRegistry.getGauges().get(gaugeName).asInstanceOf[CHGauge[A]]
+    	if (aGauge == null) {
+    		aGauge = metricRegistry.register(gaugeName, new CHGauge[A] { def getValue: A = f })
+    	}
+    	new Gauge[A](aGauge)
+    }
+  }
 
   val K:Long = 1024
   val M:Long = K * K
