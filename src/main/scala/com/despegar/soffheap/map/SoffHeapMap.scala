@@ -119,4 +119,6 @@ class SoffHeapMap[Key, Value](name: String)(implicit heapCache: HeapCache[Key, V
   override def finalize() = {
     clear()
   }
+  
+  def getName() = name
 }
