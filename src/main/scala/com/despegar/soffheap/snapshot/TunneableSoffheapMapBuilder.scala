@@ -1,4 +1,4 @@
-package com.despegar.soffheap.map
+package com.despegar.soffheap.snapshot
 
 import scala.collection.mutable.ListBuffer
 import com.despegar.soffheap.serialization.SerializerFactory
@@ -10,21 +10,22 @@ import com.despegar.soffheap.serialization.Serializer
 import com.despegar.soffheap.map.j.SoffHeapMapImpl
 import com.despegar.soffheap.heapcache.NoHeapCache
 import com.despegar.soffheap.heapcache.CacheFactory
+import com.despegar.soffheap.map.SoffHeapMap
+import com.despegar.soffheap.ABuilder;
+import com.despegar.soffheap.SomeBuilder
 
-trait TunneableSoffheapMapBuilder[T, K, V] {
+abstract class TunneableSoffheapMapBuilder[T, K, V] extends ABuilder[T] {
 
   private var maxHeapElements:Option[Int] = None
   private val hintedClasses = new ListBuffer[Class[_]]()
   private var serializerFactory:Option[SerializerFactory] = None
   protected var soffHeapName: String = s"${UUID.randomUUID().toString}."
 
-  private def self(): T = {
-    this.asInstanceOf[T]
-  }
+  def self(): T
   
-  def withName(name:String) = {
+  def withName(name:String):T = {
     soffHeapName =  name
-    self
+    me
   }
 
   def withMaximumHeapElements(elements: Int) = {

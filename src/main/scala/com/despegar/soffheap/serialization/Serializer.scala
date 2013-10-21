@@ -6,6 +6,8 @@ trait Serializer[T] {
 
   def deserialize(bytes: Array[Byte]): T
   
+  def deserialize(inputStream: java.io.InputStream): T
+  
 }
 
 trait SerializerFactory {

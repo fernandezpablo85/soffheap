@@ -6,6 +6,8 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 import scala.reflect._
 import com.despegar.soffheap.map.SoffHeapMapBuilder
+import com.despegar.soffheap.snapshot.SoffheapSnapshot
+import com.despegar.soffheap.snapshot.SnapshotBuilder
 
 
 @RunWith(classOf[JUnitRunner])

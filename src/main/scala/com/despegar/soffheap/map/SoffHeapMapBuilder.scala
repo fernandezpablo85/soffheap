@@ -8,6 +8,7 @@ import com.despegar.soffheap.serialization.kryo.KryoSerializerFactory
 import com.despegar.soffheap.serialization.SerializerFactory
 import com.despegar.soffheap.serialization.fst.FSTSerializerFactory
 import java.util.UUID
+import com.despegar.soffheap.snapshot.TunneableSoffheapMapBuilder
 
 class SoffHeapMapBuilder[K, V] extends TunneableSoffheapMapBuilder[SoffHeapMapBuilder[K, V], K, V]{
 
@@ -20,6 +21,9 @@ class SoffHeapMapBuilder[K, V] extends TunneableSoffheapMapBuilder[SoffHeapMapBu
      innerBuildSoffHeapMapJ
   }
   
+  override def self(): SoffHeapMapBuilder[K, V] = {
+    this
+  }
  
 }
 

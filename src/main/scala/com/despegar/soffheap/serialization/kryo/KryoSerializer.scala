@@ -9,11 +9,9 @@ import com.esotericsoftware.kryo.io.UnsafeInput
 import java.util.concurrent.ConcurrentLinkedQueue
 import com.despegar.soffheap.serialization.SerializerFactory
 import com.despegar.soffheap.LongAdder
+import java.io.InputStream
 
 class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics {
-
-  private[this] val serializeTimer = metrics.timer(s"${name}serialize")
-  private[this] val deserializeTimer = metrics.timer(s"${name}deserialize")
 
   val kryoFactory = new Factory[Kryo] {
     def newInstance(): Kryo = {
@@ -26,7 +24,7 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
 
   val pool = new KryoPool(name, kryoFactory, 10)
 
-  override def serialize(anObject: T): Array[Byte] = serializeTimer.time {
+  override def serialize(anObject: T): Array[Byte] = {
     val kryoHolder = pool.take()
     try {
       val kryo = kryoHolder
@@ -43,11 +41,17 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
   }
 
   override def deserialize(bytes: Array[Byte]): T = { 
+     deserialize(new UnsafeInput(bytes))
+  }
+  
+  override def deserialize(inputStream: InputStream): T = {
+    deserialize(new UnsafeInput(inputStream))
+  }
+  
+  private def deserialize(input: UnsafeInput): T = {
     val kryo = pool.take()
     try {
-      val input = new UnsafeInput(bytes)
-      val deserializedObject = kryo.readClassAndObject(input).asInstanceOf[T]
-      deserializedObject
+      kryo.readClassAndObject(input).asInstanceOf[T]
     }  finally {
       pool.release(kryo)
     }

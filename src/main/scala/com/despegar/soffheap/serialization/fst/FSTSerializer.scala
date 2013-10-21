@@ -11,9 +11,6 @@ import com.despegar.soffheap.serialization.SerializerFactory
 
 class FSTSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics  {
 
-  private[this] val serializeTimer = metrics.timer(s"${metricsPrefix}serialize")
-  private[this] val deserializeTimer = metrics.timer(s"${metricsPrefix}deserialize")
-
   System.setProperty("fst.unsafe","true")
   
   val conf = FSTConfiguration.createDefaultConfiguration()
@@ -39,16 +36,19 @@ class FSTSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) 
     stream.close();
   }
   
-  override def serialize(anObject: T): Array[Byte] = serializeTimer.time {
+  override def serialize(anObject: T): Array[Byte] =  {
     val stream = new ByteArrayOutputStream()
     mywriteMethod[T](stream, anObject)
     stream.toByteArray
   }
 
   override def deserialize(bytes: Array[Byte]): T = {
-//    deserializeTimer.time {
     val stream = new ByteArrayInputStream(bytes)
     myreadMethod[T](stream)
+  }
+  
+  override def deserialize(inputStream: InputStream): T = {
+    myreadMethod[T](inputStream)
   }
 
   def metricsPrefix: String = name
