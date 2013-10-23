@@ -20,7 +20,7 @@ class Loader[Key,Value](snapshot: SoffheapSnapshot[Key, Value], dataSource: Data
   
   def load(shouldCheckDisk: Boolean = true) = {
 	 val values = getValues(shouldCheckDisk)
-     snapshot.reload(values)
+     snapshot.reload(values.asScala.toMap)
      diskPersistor.foreach( p => p.persist(values))
   }
   
@@ -28,11 +28,11 @@ class Loader[Key,Value](snapshot: SoffheapSnapshot[Key, Value], dataSource: Data
 	  load(false)
   }
   
-  private def getValues(shouldCheckDisk: Boolean): Map[Key, Value] = {
+  private def getValues(shouldCheckDisk: Boolean): java.util.Map[Key, Value] = {
 	  if (shouldCheckDisk && diskPersistor.isDefined && diskPersistor.get.hasData ) {
-	    diskPersistor.get.loadFromDisk.asInstanceOf[Map[Key, Value]]
+	    diskPersistor.get.loadFromDisk.asInstanceOf[java.util.Map[Key, Value]]
 	 } else {
-	   dataSource.get.asScala.toMap
+	   dataSource.get
 	 }
   }
 

@@ -12,10 +12,6 @@ class SnapshotBuilder[Key, Value] extends TunneableSoffheapMapBuilder[SnapshotBu
     this
   }
   
-  override def me(): SnapshotBuilder[Key, Value]  = {
-    this
-  }
-
   def withDiskPersistence(path: String): SnapshotBuilder[Key, Value] = {
     val thePath = if (path != null && path.trim().length() > 0) {
       val trimmed = path.trim()

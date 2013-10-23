@@ -8,9 +8,9 @@ import java.io.FileInputStream
 
 class KryoDiskPersistor(path: String, name: String) extends DiskPersistor {
 
-  val serializer = new KryoSerializer[Map[_,_]](s"DiskPersistor-$name")
+  val serializer = new KryoSerializer[java.util.Map[_,_]](s"DiskPersistor-$name")
   
-  override def persist(values: Map[_,_]) = {
+  override def persist(values: java.util.Map[_,_]) = {
     val fileOutputStream = new FileOutputStream(file)
     val bytes = serializer.serialize(values)
     fileOutputStream.write(bytes)
@@ -24,15 +24,16 @@ class KryoDiskPersistor(path: String, name: String) extends DiskPersistor {
     snapshotFile
   }
   
-  override def loadFromDisk: Map[_, _] = {
+  override def loadFromDisk: java.util.Map[_, _] = {
     val fileInputStream = new FileInputStream(file)
     val values = serializer.deserialize(fileInputStream)
     fileInputStream.close()
-    values.asInstanceOf[Map[_, _]]
+    values.asInstanceOf[java.util.Map[_, _]]
   }
   
   override def hasData: Boolean = {
-     file().exists()
+     val exists = file().exists()
+     exists
   }
   
 }
