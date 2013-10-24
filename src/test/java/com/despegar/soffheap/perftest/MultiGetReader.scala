@@ -8,7 +8,7 @@ class MultiGetReader[Key, Value](soffheapMap: SoffHeapMap[Key, Value], keyFactor
   override def run() = {
      while(!Thread.interrupted()) { 
        try {
-//    	val keys = (1 to 1000) map { _ => keyFactory() }
+
          val arrayList = new ArrayList[Key]()
         (1 to 1000) foreach { i => arrayList.add(keyFactory()) }
         val list = soffheapMap.jmultiGet(arrayList)

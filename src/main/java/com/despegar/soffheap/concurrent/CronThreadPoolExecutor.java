@@ -39,11 +39,6 @@ import com.despegar.soffheap.CronExpression;
   public class CronThreadPoolExecutor extends ScheduledThreadPoolExecutor implements CronExecutorService
   {
    
-    /**
-     * Constructs a new CronThreadPoolExecutor.
-     * @param corePoolSize
-     * @param handler
-     */
     public CronThreadPoolExecutor(int corePoolSize, ThreadFactory threadFactory)
     {
       super(corePoolSize, threadFactory);
@@ -58,9 +53,6 @@ import com.despegar.soffheap.CronExpression;
       super(corePoolSize, DaemonThreadFactory.getInstance());
     }
     
-    /**
-     * @see net.sf.hajdbc.util.concurrent.CronExecutorService#schedule(java.lang.Runnable, org.quartz.CronExpression)
-     */
     @Override
     public void schedule(final Runnable task, final CronExpression expression)
     {

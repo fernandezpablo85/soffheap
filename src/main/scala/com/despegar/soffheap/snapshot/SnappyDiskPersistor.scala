@@ -1,14 +1,14 @@
 package com.despegar.soffheap.snapshot
 
-import com.despegar.soffheap.serialization.kryo.KryoSerializer
 import java.io.FileOutputStream
 import java.io.File
 import java.io.FileInputStream
+import com.despegar.soffheap.serialization.snappy.SnappySerializer
 
 
-class KryoDiskPersistor(path: String, name: String) extends DiskPersistor {
+class SnappyDiskPersistor(path: String, name: String) extends DiskPersistor {
 
-  val serializer = new KryoSerializer[java.util.Map[_,_]](s"DiskPersistor-$name")
+  val serializer = SnappySerializer[java.util.Map[_,_]]
   
   override def persist(values: java.util.Map[_,_]) = {
     val fileOutputStream = new FileOutputStream(file)
@@ -35,5 +35,4 @@ class KryoDiskPersistor(path: String, name: String) extends DiskPersistor {
      val exists = file().exists()
      exists
   }
-  
 }

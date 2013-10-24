@@ -19,14 +19,17 @@ crossPaths := false
 publishTo := Some("Nexus releases" at "http://nexus.despegar.it:8080/nexus/content/repositories/releases")
     
 libraryDependencies ++= Seq(
-    "com.esotericsoftware.kryo"     %  "kryo"           % "2.22",
+    "com.esotericsoftware.kryo"   %  "kryo"  % "2.22",
     "nl.grons" %% "metrics-scala" % "3.0.2" exclude("com.typesafe.akka","akka-actor_2.10"),
-    "com.google.guava" % "guava" % "15.0",
+    "com.google.guava" % "guava"  % "15.0",
+    "org.springframework" % "spring-context" % "3.2.4.RELEASE" % "provided",
+    "org.xerial.snappy" % "snappy-java" % "1.0.5",
     "org.scalatest" % "scalatest_2.10" % "2.0.M6" % "test",
     "junit" % "junit" % "4.8.1" % "test",
+    "org.mockito" % "mockito-all" % "1.8.4" % "test",
     "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0" % "test",
     "com.google.code.gson" % "gson" % "1.7.1"  % "test"
-) 
+)
 
 EclipseKeys.withSource := true
 

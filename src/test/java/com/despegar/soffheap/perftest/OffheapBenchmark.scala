@@ -1,12 +1,10 @@
 package com.despegar.soffheap.perftest
 
-import annotation.tailrec
 import com.google.caliper.Param
 import com.despegar.soffheap.map.SoffHeapMap
 import com.despegar.soffheap.PojoValue
 import scala.collection.mutable.ListBuffer
 import java.util.HashMap
-import com.despegar.soffheap.serialization.kryo.KryoSerializer
 import com.despegar.soffheap.map.SoffHeapMapBuilder
 
 // a caliper benchmark is a class that extends com.google.caliper.Benchmark

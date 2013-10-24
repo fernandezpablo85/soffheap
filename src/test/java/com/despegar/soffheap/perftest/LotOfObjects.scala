@@ -1,6 +1,6 @@
 package com.despegar.soffheap.perftest
 
-import com.despegar.soffheap.map.{SoffHeapMapBuilder, SoffHeapMap}
+import com.despegar.soffheap.map.SoffHeapMapBuilder
 import java.lang.management.ManagementFactory
 import com.despegar.soffheap.SoffHeap
 import com.despegar.soffheap.SnapshotValue
@@ -32,7 +32,7 @@ object LotOfObjects extends App {
 
       snapshot.put(s"key$index", obj)
       
-      val arrayFromOffheap = snapshot.get(s"key$index").get
+      println(snapshot.get(s"key$index").get)
   }
 
   while (true) {}

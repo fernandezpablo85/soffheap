@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean name="someSnapshot" class="com.despegar.soffheap.spring.SnapshotFactoryBean">
+        <property name="name" value="SnapshotTest"></property>
+        <property name="cronExpression" value="0/2 * * ? * *"></property>
+        <property name="path" value="/tmp"></property>
+        <property name="dataSource" ref="snapshotBuilderDs"></property>
+        <property name="hintedClasses" ref="hintedClasses"/>
+    </bean>
+
+    <bean name="snapshotBuilderDs" class="com.despegar.soffheap.SomeDataSource"/>
+
+    <util:set id="hintedClasses">
+        <value type="java.lang.Class">com.despegar.soffheap.PojoValue</value>
+    </util:set>
+
+</beans>

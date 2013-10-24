@@ -11,8 +11,7 @@ import com.despegar.soffheap.map.j.SoffHeapMapImpl
 import com.despegar.soffheap.heapcache.NoHeapCache
 import com.despegar.soffheap.heapcache.CacheFactory
 import com.despegar.soffheap.map.SoffHeapMap
-import com.despegar.soffheap.ABuilder;
-import com.despegar.soffheap.SomeBuilder
+
 
 abstract class TunneableSoffheapMapBuilder[T, K, V] {
 
@@ -33,11 +32,6 @@ abstract class TunneableSoffheapMapBuilder[T, K, V] {
     self
   }
 
-  def withMaxSoffHeapMemoryInGB(size: Long) = {
-    System.setProperty("maxSoffHeapMemoryInGB", s"$size")
-    self
-  }
-  
   def withHintedClass(hintedClass: Class[_]) = {
     hintedClasses += hintedClass
     self

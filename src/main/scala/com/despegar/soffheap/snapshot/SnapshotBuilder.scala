@@ -13,13 +13,16 @@ class SnapshotBuilder[Key, Value] extends TunneableSoffheapMapBuilder[SnapshotBu
   }
   
   def withDiskPersistence(path: String): SnapshotBuilder[Key, Value] = {
-    val thePath = if (path != null && path.trim().length() > 0) {
+    if (path == null || path.trim().length() == 0) {
+      withDiskPersistence()
+    }else{
       val trimmed = path.trim()
-      if (trimmed.endsWith(String.valueOf(File.separatorChar)))
+      diskPersistencePath = Some(
+        if (trimmed.endsWith(String.valueOf(File.separatorChar)))
         trimmed.substring(0, trimmed.length() - 1)
-      else trimmed
+      else trimmed)
     }
-    diskPersistencePath = Some(path)
+
     this
   }
   
@@ -38,7 +41,7 @@ class SnapshotBuilder[Key, Value] extends TunneableSoffheapMapBuilder[SnapshotBu
   }
 
   private def createDiskPersistor() = {
-    diskPersistencePath.map(path => new KryoDiskPersistor(path, soffHeapName))
+    diskPersistencePath.map(path => new SnappyDiskPersistor(path, soffHeapName))
   }
 
   def build(): Snapshot[Key, Value] = {

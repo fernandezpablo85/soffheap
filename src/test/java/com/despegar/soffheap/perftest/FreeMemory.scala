@@ -2,7 +2,6 @@ package com.despegar.soffheap.perftest
 
 import scala.collection.mutable.ListBuffer
 import com.despegar.soffheap.PojoValue
-import com.despegar.soffheap.metrics.Metrics
 
 object FreeMemory extends App {
 

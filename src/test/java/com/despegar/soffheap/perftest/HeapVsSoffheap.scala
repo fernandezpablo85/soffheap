@@ -1,6 +1,5 @@
 package com.despegar.soffheap.perftest
 
-import com.despegar.soffheap.map.SoffHeapMap
 import com.despegar.soffheap.PojoValue
 import scala.collection.mutable.ListBuffer
 
