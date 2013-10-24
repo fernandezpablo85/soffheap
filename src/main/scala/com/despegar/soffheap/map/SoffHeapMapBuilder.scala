@@ -18,7 +18,7 @@ class SoffHeapMapBuilder[K, V] extends TunneableSoffheapMapBuilder[SoffHeapMapBu
   
 
   def buildJ() = {
-     innerBuildSoffHeapMapJ
+     innerBuildSoffHeapMapJ()
   }
   
   override def self(): SoffHeapMapBuilder[K, V] = {

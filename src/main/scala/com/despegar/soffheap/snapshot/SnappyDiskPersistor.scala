@@ -8,10 +8,10 @@ import com.despegar.soffheap.serialization.snappy.SnappySerializer
 
 class SnappyDiskPersistor(path: String, name: String) extends DiskPersistor {
 
-  val serializer = SnappySerializer[java.util.Map[_,_]]
+  val serializer = SnappySerializer[java.util.Map[_, _]]()
   
   override def persist(values: java.util.Map[_,_]) = {
-    val fileOutputStream = new FileOutputStream(file)
+    val fileOutputStream = new FileOutputStream(file())
     val bytes = serializer.serialize(values)
     fileOutputStream.write(bytes)
     fileOutputStream.flush()
@@ -25,7 +25,7 @@ class SnappyDiskPersistor(path: String, name: String) extends DiskPersistor {
   }
   
   override def loadFromDisk: java.util.Map[_, _] = {
-    val fileInputStream = new FileInputStream(file)
+    val fileInputStream = new FileInputStream(file())
     val values = serializer.deserialize(fileInputStream)
     fileInputStream.close()
     values.asInstanceOf[java.util.Map[_, _]]

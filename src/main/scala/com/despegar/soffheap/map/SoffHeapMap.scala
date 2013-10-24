@@ -1,13 +1,11 @@
 package com.despegar.soffheap.map
 
-import java.util.concurrent.atomic.AtomicReference
 import scala.collection.Iterable
-import com.despegar.soffheap.metrics.{ Metrics }
+import com.despegar.soffheap.metrics.Metrics
 import com.despegar.soffheap.heapcache.HeapCache
 import com.despegar.soffheap.OffheapReference
 import com.despegar.soffheap.serialization.Serializer
 import scala.collection.JavaConverters._
-import scala.collection.concurrent.TrieMap
 import java.util.HashMap
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,6 +19,7 @@ class SoffHeapMap[Key, Value](name: String)(implicit heapCache: HeapCache[Key, V
   def put(key: Key, value: Value): Unit = {
     val soffheapRef = asSoffHeapReference(value)
     val oldReference = map.putIfAbsent(key, soffheapRef)
+
     if (oldReference != null) {
       map.put(key, soffheapRef)
       oldReference.unreference()
@@ -109,7 +108,7 @@ class SoffHeapMap[Key, Value](name: String)(implicit heapCache: HeapCache[Key, V
   private[this] def remove(key: Key) = {
     val soffheapRef = map.get(key)
     if (soffheapRef != null) {
-      soffheapRef.unreference
+      soffheapRef.unreference()
       map.remove(key)
     }
   }
@@ -120,5 +119,5 @@ class SoffHeapMap[Key, Value](name: String)(implicit heapCache: HeapCache[Key, V
     clear()
   }
   
-  def getName() = name
+  def getName = name
 }

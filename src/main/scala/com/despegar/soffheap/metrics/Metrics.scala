@@ -12,13 +12,14 @@ trait Metrics extends InstrumentedBuilder {
 
   def metricsPrefix:String
 
-  val metricRegistry = Metrics.metrics
+  val metricRegistry = Metrics.registry
   
   def safeGauge[A](name: String, scope: String = null)(f: => A): Gauge[A] = {
     metricRegistry.synchronized {
-        val gaugeName = MetricBuilder.metricName(getClass, Seq(name, scope))
+      val gaugeName = MetricBuilder.metricName(getClass, Seq(name, scope))
     	var aGauge = metricRegistry.getGauges().get(gaugeName).asInstanceOf[CHGauge[A]]
-    	if (aGauge == null) {
+
+      if (aGauge == null) {
     		aGauge = metricRegistry.register(gaugeName, new CHGauge[A] { def getValue: A = f })
     	}
     	new Gauge[A](aGauge)
@@ -44,19 +45,18 @@ trait Metrics extends InstrumentedBuilder {
 }
 
 object Metrics {
-
-  val metrics = new MetricRegistry()
-
-  val reporter = JmxReporter.forRegistry(metrics).inDomain("SoffHeap").convertRatesTo(TimeUnit.SECONDS)
+  val registry = new MetricRegistry()
+  val reporter = JmxReporter.forRegistry(registry)
+                            .inDomain("SoffHeap")
+                            .convertRatesTo(TimeUnit.SECONDS)
                             .convertDurationsTo(TimeUnit.MILLISECONDS)
                             .build()
   reporter.start()
 
 }
 
-object JMetrics {
-
-  def getMetrics() = {
-     Metrics.metrics
+object SoffHeapMetricsRegistryHolder {
+  def getMetricsRegistry() = {
+     Metrics.registry
    }
 }

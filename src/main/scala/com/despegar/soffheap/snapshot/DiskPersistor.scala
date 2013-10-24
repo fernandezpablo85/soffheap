@@ -16,7 +16,7 @@ object DiskPersistor {
 
   def createPathTo(file: File) {
 
-    val parent = file.getParentFile();
+    val parent = file.getParentFile()
     if (parent != null && !parent.exists()) {
       createPathTo(parent)
     }
