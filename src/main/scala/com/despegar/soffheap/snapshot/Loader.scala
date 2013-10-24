@@ -13,13 +13,13 @@ class Loader[Key,Value](snapshot: SoffHeapSnapshot[Key, Value], dataSource: Data
     override def newThread(runnable: Runnable) = {
        val thread = Executors.defaultThreadFactory().newThread(runnable)
        thread.setDaemon(true)
-       thread.setName(s"SoffheapSnapshotReloader-${snapshot.getName}")
+       thread.setName(s"SoffHeapSnapshotReloader-${snapshot.getName}")
        thread
     }
   })
   
   def load(shouldCheckDisk: Boolean = true) = {
-	 val values = getValues(shouldCheckDisk)
+  	 val values = getValues(shouldCheckDisk)
      snapshot.reload(values.asScala.toMap)
      diskPersistor.foreach( p => p.persist(values))
   }
