@@ -24,27 +24,27 @@ abstract class TunneableSoffheapMapBuilder[T, K, V] {
   
   def withName(name:String) = {
     soffHeapName =  name
-    self
+    self()
   }
 
   def withMaximumHeapElements(elements: Int) = {
     maxHeapElements = Some(elements)
-    self
+    self()
   }
 
   def withHintedClass(hintedClass: Class[_]) = {
     hintedClasses += hintedClass
-    self
+    self()
   }
   
   def withKryo = {
     this.serializerFactory = Some(new KryoSerializerFactory())
-    self
+    self()
   }
   
   def withFST = {
     this.serializerFactory = Some(new FSTSerializerFactory())
-    self
+    self()
   }
 
   protected def innerBuildSoffHeapMap() = {

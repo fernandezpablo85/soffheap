@@ -40,14 +40,14 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
     }
   }
 
-  override def deserialize(bytes: Array[Byte]): T = { 
+  override def deserialize(bytes: Array[Byte]): T = {
      deserialize(new UnsafeInput(bytes))
   }
-  
+
   override def deserialize(inputStream: InputStream): T = {
     deserialize(new UnsafeInput(inputStream))
   }
-  
+
   private def deserialize(input: UnsafeInput): T = {
     val kryo = pool.take()
     try {
@@ -63,19 +63,18 @@ class KryoSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty)
 trait Factory[T] {
   def newInstance(): T
 }
- 
+
 class KryoPool(name: String, factory: Factory[Kryo], initInstances: Int) extends Metrics {
   val instances = new LongAdder()
   instances.add(initInstances)
   val maxInstances = initInstances * 2
-  val objects = new ConcurrentLinkedQueue[Kryo]();
+  val objects = new ConcurrentLinkedQueue[Kryo]()
   val kryoInstancesGauge = safeGauge(s"${name}kryoInstances") {
      instances.intValue()
   }
 
   (1 to initInstances) foreach { _ =>  objects.offer(factory.newInstance())}
-  
-  
+
   def take(): Kryo = {
     val pooledKryo = objects.poll()
     if (pooledKryo == null) {
@@ -95,14 +94,14 @@ class KryoPool(name: String, factory: Factory[Kryo], initInstances: Int) extends
   def close() = {
     objects.clear()
   }
-  
+
   override def metricsPrefix = name
 
 }
 
 
 class KryoSerializerFactory extends SerializerFactory {
-  
+
   override def create[T](name:String, hintedClasses: List[Class[_]]) = {
      new KryoSerializer[T](name, hintedClasses)
   }

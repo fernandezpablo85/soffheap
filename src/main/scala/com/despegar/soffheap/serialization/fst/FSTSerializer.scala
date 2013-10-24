@@ -9,7 +9,7 @@ import java.io.OutputStream
 import de.ruedigermoeller.serialization.FSTConfiguration
 import com.despegar.soffheap.serialization.SerializerFactory
 
-class FSTSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) extends Serializer[T] with Metrics  {
+class FSTSerializer[T](name:String, hintedClasses: Seq[Class[_]] = Seq.empty) extends Serializer[T] with Metrics  {
 
   System.setProperty("fst.unsafe","true")
   
@@ -18,44 +18,45 @@ class FSTSerializer[T](name:String, hintedClasses: List[Class[_]] = List.empty) 
   conf.setPreferSpeed(true)
   conf.setShareReferences(false)
   conf.setCrossLanguage(false)
+
   hintedClasses.foreach( hintedClass => conf.getClassRegistry().registerClass(hintedClass))
 
-  def myreadMethod[T](stream:InputStream):T = {
-    val in = conf.getObjectInput(stream);
-    val result = in.readObject();
+  private[this] def fstDeserialize[T](stream:InputStream):T = {
+    val in = conf.getObjectInput(stream)
+    val result = in.readObject()
     // DON'T: in.close(); prevents reuse and will result in an exception
-    stream.close();
+    stream.close()
     result.asInstanceOf[T]
   }
 
-  def mywriteMethod[T](stream: OutputStream , toWrite:Any ) = {
-    val out = conf.getObjectOutput(stream);
-    out.writeObject( toWrite, classOf[Any]);
+  private[this] def fstSerialize[T](stream: OutputStream , toWrite:Any ) = {
+    val out = conf.getObjectOutput(stream)
+    out.writeObject( toWrite, classOf[Any])
     // DON'T out.close();
-    out.flush();
-    stream.close();
+    out.flush()
+    stream.close()
   }
   
   override def serialize(anObject: T): Array[Byte] =  {
     val stream = new ByteArrayOutputStream()
-    mywriteMethod[T](stream, anObject)
+    fstSerialize[T](stream, anObject)
     stream.toByteArray
   }
 
   override def deserialize(bytes: Array[Byte]): T = {
     val stream = new ByteArrayInputStream(bytes)
-    myreadMethod[T](stream)
+    fstDeserialize[T](stream)
   }
   
   override def deserialize(inputStream: InputStream): T = {
-    myreadMethod[T](inputStream)
+    fstDeserialize[T](inputStream)
   }
 
   def metricsPrefix: String = name
 }
 
 class FSTSerializerFactory extends SerializerFactory {
-  
+
   override def create[T](name:String, hintedClasses: List[Class[_]]) = {
      new FSTSerializer[T](name, hintedClasses)
   }

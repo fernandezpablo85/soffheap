@@ -45,7 +45,7 @@ class SnapshotBuilder[Key, Value] extends TunneableSoffheapMapBuilder[SnapshotBu
   }
 
   def build(): Snapshot[Key, Value] = {
-    val snapshot = new SoffheapSnapshot[Key, Value](innerBuildSoffHeapMap)
+    val snapshot = new SoffHeapSnapshot[Key, Value](innerBuildSoffHeapMap())
     val loader = new Loader(snapshot, dataSource, createDiskPersistor())
     loader.load()
     loader.scheduleReloadAt(cronExpression)

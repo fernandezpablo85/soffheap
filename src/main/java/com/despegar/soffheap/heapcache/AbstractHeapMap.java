@@ -3,7 +3,7 @@ package com.despegar.soffheap.heapcache;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
-import com.despegar.soffheap.metrics.JMetrics;
+import com.despegar.soffheap.metrics.SoffHeapMetricsRegistryHolder;
 
 import static java.text.MessageFormat.format;
 
@@ -13,9 +13,8 @@ public abstract class AbstractHeapMap<Key,Value> implements HeapCache<Key,Value>
     protected final Counter missesCounter;
     protected final Counter invalidatesCounter;
 
-	
 	public AbstractHeapMap(String name) {
-        registry = JMetrics.getMetrics();
+        registry = SoffHeapMetricsRegistryHolder.getMetricsRegistry();
         hitsCounter = registry.counter(format("{0}.{1}hits", HeapCache.class.getName(), name));
         missesCounter = registry.counter(format("{0}.{1}misses", HeapCache.class.getName(), name));
         invalidatesCounter = registry.counter(format("{0}.{1}invalidates", HeapCache.class.getName(), name));

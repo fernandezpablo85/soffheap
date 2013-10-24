@@ -36,7 +36,7 @@ class OffheapBenchmark extends SimpleScalaBenchmark {
     (1 to arrays) foreach {
        arrayIndex => 
        val listBuffer: ListBuffer[PojoValue] = ListBuffer.empty
-		     (1 to elements) foreach { (i => listBuffer += new PojoValue(s"value$i", i)) }
+		     (1 to elements) foreach { i => listBuffer += new PojoValue(s"value$i", i) }
        val value = listBuffer.toArray
        val key = s"key-$arrayIndex"
          	 snapshot.put(key, value)
