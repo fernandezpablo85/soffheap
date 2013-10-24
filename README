@@ -1,0 +1,82 @@
+SoffHeap
+
+A solution to store large set of objects out of the Java heap space using sun.misc.Unsafe to minimize GC overhead. 
+
+Usage (Scala)
+
+SBT settings 
+
+Add the following sbt dependency to your project settings:
+
+libraryDependencies += "com.despegar" % "soffheap" % "0.1.2"
+
+Example
+
+val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
+
+soffHeapMap.put("key1", SomeObject()) //the object is moved out of the heap
+
+val someObjectFromOffheap = soffHeapMap.get("key1")
+
+
+Usage (Java)
+
+SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plan Java access
+
+soffHeapMap.put("key1", SomeObject()) //the object is moved out of the heap
+
+val someObjectFromOffheap = soffHeapMap.get("key1")
+
+
+Add the following dependency to your pom.xml (Maven):
+
+<dependency>
+	<group>com.despegar</group>
+	<artifactId>soffheap</artifactId>
+	<version>0.1.2</version>
+</dependency>
+
+Usage (Spring)
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean name="someSnapshot" class="com.despegar.soffheap.spring.SnapshotFactoryBean">
+        <property name="name" value="SnapshotTest"></property>
+        <property name="cronExpression" value="0/2 * * ? * *"></property>
+        <property name="path" value="/tmp"></property>
+        <property name="dataSource" ref="snapshotBuilderDs"></property>
+        <property name="hintedClasses" ref="hintedClasses"/>
+    </bean>
+
+    <bean name="snapshotBuilderDs" class="com.despegar.soffheap.SomeDataSource"/>
+
+    <util:set id="hintedClasses">
+        <value type="java.lang.Class">com.despegar.soffheap.PojoValue</value>
+    </util:set>
+
+</beans>
+
+
+Implementation details
+
+Built in Scala.
+It uses reference counting to free unused objects. 
+HeapCache
+Kryo and FST serialization 
+Metrics statistics.
+Disk persistence.
+Scheduled reloads.
+Basic spring support.
+
+
+Limitations
+
+The first implementation only supports a keyvalue store.
+Only supports sun.misc.Unsafe. Fallback to directMemory is pending.
+No TTL support.
+
+
+
