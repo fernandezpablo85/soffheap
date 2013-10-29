@@ -43,11 +43,11 @@ val someObjectFromOffheap = soffHeapMap.get("key")
 
 ```scala
 val ds = new DataSource[String, SomeType]{..} 
-val snapshot = SnapshotBuilder[String, SomeType]().withDiskPersistence()
-						  .withName("snapshotName") 
-						  .withDataSource(ds)
-						  .withReloadsAt("0/5 * * ? * *") //schedule a reload
-						  .build()
+val snapshot = SnapshotBuilder[String,SomeType]().withDiskPersistence()
+						 .withName("snapshotName") 
+						 .withDataSource(ds)
+						 .withReloadsAt("0/5 * * ? * *") //schedule a reload
+						 .build()
 snapshot.get("key")
 snapshot.multiGet("key" :: "key1" :: Nil)
 ```
@@ -121,6 +121,7 @@ SoffHeap exposes a set of metrics that can be used to monitor its behavior. By d
 
 ### Example:
 ```scala
+val ganglia  =  new GMetric("ganglia.example.com", 8649, UDPAddressingMode.MULTICAST, 1)
 val registry =  SoffHeapMetricsRegistryHolder.getMetricsRegistry()
 val reporter =  GangliaReporter.forRegistry(registry)
                                .convertRatesTo(TimeUnit.SECONDS)
