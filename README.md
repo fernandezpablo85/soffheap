@@ -32,7 +32,7 @@ Add the following dependency to your pom.xml (Maven):
 </dependency>
 ```
 ```java
-SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plan Java access
+SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plain Java access
 
 soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
@@ -115,7 +115,7 @@ reporter.start(1, TimeUnit.MINUTES)
 ## History
   * October 29, 2013   Released version 0.1.4
 
-## Licence
+## License
 
 Licensed under the BSD license.
 
