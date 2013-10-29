@@ -2,7 +2,7 @@ SoffHeap
 ===
 A simple library to store large set of objects out of the Java heap space using sun.misc.Unsafe to minimize GC overhead. 
 
-### Usage (Java)
+## Usage (Java)
 
 Add the following dependency to your pom.xml (Maven):
 
