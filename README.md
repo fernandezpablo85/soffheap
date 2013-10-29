@@ -76,14 +76,10 @@ java -DmaximumSoffHeapMemoryInGB=4
 ```
 ## Tunings
   * Hinted classes: The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
-  ```scala
-    SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject])
-						  .withHintedClass(classOf[SomeOtherClass])...
-  ```						  
+  ```scala SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject])
+							 .withHintedClass(classOf[SomeOtherClass])... ```						  
   * Heap cache: Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
-  ```scala
-    SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
-  ```
+  ```scala SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10) ```
 
 ## Implementation details
 
