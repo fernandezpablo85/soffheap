@@ -39,17 +39,18 @@ soffHeapMap.put("key", SomeObject()) //the object is moved out of the heap
 val someObjectFromOffheap = soffHeapMap.get("key")
 ```
 
-## Snapshot(permanent data set in memory, without expiration) :
+#### Snapshot(permanent data set in memory, without expiration) :
 
 ```scala
 val ds = new DataSource[String, SomeType]{..} 
-val snapshot = SnapshotBuilder[String, SomeType]().withDiskPersistence() //save to disk
-						  .withName("snapshotName") 
-						  .withDataSource(ds)
-						  .withReloadsAt("0/5 * * ? * *") //schedule a reload
-						  .build()
+val snapshot = SnapshotBuilder[String, SomeType]()
+			.withDiskPersistence() //save to disk
+			.withName("snapshotName") 
+			.withDataSource(ds)
+			.withReloadsAt("0/5 * * ? * *") //schedule a reload
+			.build()
 snapshot.get("key")
-snapshot.multiGet("key" :: "key2" :: Nil)
+snapshot.multiGet("key" :: "key1" :: Nil)
 ```
 
 ## Usage (Spring)
