@@ -42,13 +42,17 @@ soffHeapMap.put("key1", new SomeObject()); //the object is moved out of the heap
 SomeObject someObjectFromOffheap = soffHeapMap.get("key1"); 
 ```
 
-## Usage (Spring integration)
+## Usage (Spring)
 
 ```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       
+       http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://www.springframework.org/schema/util 
+       http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean name="someSnapshot" class="com.despegar.soffheap.spring.SnapshotFactoryBean">
         <property name="name" value="SnapshotTest"></property>
@@ -67,37 +71,37 @@ SomeObject someObjectFromOffheap = soffHeapMap.get("key1");
 </beans>
 ```
 
-### Configuration
+## Configuration
 
 By default SoffHeap sets a limit of 2GB in the maximum amount of memory that can be allocated to store objects. This limit can be modified by passing a VM parameter.
 
-Example: 
+### Example: 
+```java
+java -DmaximumSoffHeapMemoryInGB=4
+```
 
-java -DmaximumSoffHeapMemoryInGB=4 SomeMain
+## Tunings
+  * Hinted classes. The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
+    ```scala
+    * SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject]).withHintedClass(classOf[SomeOtherClass])...
+    ```
+  * Heap cache. Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
+    ```scala
+    * SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
+    ```
 
+## Implementation details
 
-Tunings
+  * Built in Scala.
+  * It uses Reference Counting to free unused objects.
+  * LRU Heap Cache.
+  * Kryo and FST serialization. 
+  * Metrics statistics.
+  * Disk persistence.
+  * Scheduled reloads.
+  * Basic spring support.
 
-Hinted classes. The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
-
-SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject]).withHintedClass(classOf[SomeOtherClass])...
-
-Heap cache. Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
-
-SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
-
-Implementation details
-
-Built in Scala.
-It uses Reference Counting to free unused objects. 
-LRU Heap Cache
-Kryo and FST serialization 
-Metrics statistics.
-Disk persistence.
-Scheduled reloads.
-Basic spring support.
-
-Monitoring
+## Monitoring
 
 SoffHeap exposes a set of metrics that can be used to monitor its behavior. By default a JMX exporter is used. Other monitoring solutions can be used by setting Codahale Metrics reporters to the SoffHeap MetricsRegistry.
 
@@ -105,11 +109,11 @@ Metrics
 
 //to complete
 
-Limitations
+## Limitations
 
-The first implementation only supports a keyvalue store.
-Only supports sun.misc.Unsafe. Fallback to DirectBuffer usage is pending.
-No TTL support.
+  * The first implementation only supports a keyvalue store.
+  * Only support sun.misc.Unsafe. Fallback to DirectBuffer usage is pending.
+  * No TTL support.
 
 
 
