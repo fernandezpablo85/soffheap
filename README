@@ -8,7 +8,7 @@ SBT settings
 
 Add the following sbt dependency to your project settings:
 
-libraryDependencies += "com.despegar" % "soffheap" % "0.1.2"
+libraryDependencies += "com.despegar" % "soffheap" % "0.1.2" //
 
 Example
 
@@ -17,7 +17,6 @@ val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
 soffHeapMap.put("key1", SomeObject()) //the object is moved out of the heap
 
 val someObjectFromOffheap = soffHeapMap.get("key1")
-
 
 Usage (Java)
 
