@@ -121,13 +121,13 @@ SoffHeap exposes a set of metrics that can be used to monitor its behavior. By d
 
 ### Example:
 ```scala
-val ganglia  =  new GMetric("ganglia.example.com", 8649, UDPAddressingMode.MULTICAST, 1)
+val ganglia  =  new GMetric("ganglia.com", 8649, UDPAddressingMode.MULTICAST, 1)
 val registry =  SoffHeapMetricsRegistryHolder.getMetricsRegistry()
 val reporter =  GangliaReporter.forRegistry(registry)
                                .convertRatesTo(TimeUnit.SECONDS)
                                .convertDurationsTo(TimeUnit.MILLISECONDS)
                                .build(ganglia)
-  
+
 reporter.start(1, TimeUnit.MINUTES)
 ```
 ## Limitations
