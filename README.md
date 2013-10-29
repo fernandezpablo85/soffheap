@@ -81,13 +81,13 @@ java -DmaximumSoffHeapMemoryInGB=4
 ```
 
 ## Tunings
-  * Hinted classes. The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
+  * Hinted classes: The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
     ```scala
-    * SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject]).withHintedClass(classOf[SomeOtherClass])...
+    SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject]).withHintedClass(classOf[SomeOtherClass])...
     ```
-  * Heap cache. Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
+  * Heap cache: Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
     ```scala
-    * SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
+    SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
     ```
 
 ## Implementation details
@@ -99,15 +99,21 @@ java -DmaximumSoffHeapMemoryInGB=4
   * Metrics statistics.
   * Disk persistence.
   * Scheduled reloads.
-  * Basic spring support.
+  * Basic Spring support.
 
 ## Monitoring
 
 SoffHeap exposes a set of metrics that can be used to monitor its behavior. By default a JMX exporter is used. Other monitoring solutions can be used by setting Codahale Metrics reporters to the SoffHeap MetricsRegistry.
 
-Metrics
-
-//to complete
+### Example:
+```scala
+val registry =  SoffHeapMetricsRegistryHolder.getMetricsRegistry()
+val reporter =  GangliaReporter.forRegistry(registry)
+                               .convertRatesTo(TimeUnit.SECONDS)
+                               .convertDurationsTo(TimeUnit.MILLISECONDS)
+                               .build(ganglia)
+  
+reporter.start(1, TimeUnit.MINUTES)
 
 ## Limitations
 
