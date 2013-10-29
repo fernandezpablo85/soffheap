@@ -14,7 +14,7 @@ Add the following dependency to your pom.xml (Maven):
 </dependency>
 ```
 ```java
-SoffHeapMapBuilder<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<..>().buildJ();
+soffHeapMap = new SoffHeapMapBuilder<String,SomeType>().buildJ();
 
 soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
