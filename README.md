@@ -32,7 +32,7 @@ Add the following dependency to your pom.xml (Maven):
 </dependency>
 ```
 ```java
-SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plan Java access
+SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plain Java access
 
 soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
@@ -75,14 +75,13 @@ By default SoffHeap sets a limit of 2GB in the maximum amount of memory that can
 java -DmaximumSoffHeapMemoryInGB=4
 ```
 ## Tunings
-  * Hinted classes: The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
-```scala 
-SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject])
-						       .withHintedClass(classOf[SomeOtherClass])... 
+Hinted classes: The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
+```scala SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject])
+						       .withHintedClass(classOf[SomeOtherClass]).
 ```						  
-  * Heap cache: Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
+Heap cache: Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
 ```scala 
-SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10) 
+SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
 ```
 
 ## Implementation details
@@ -119,7 +118,7 @@ reporter.start(1, TimeUnit.MINUTES)
 ## History
   * October 29, 2013   Released version 0.1.4
 
-## Licence
+## License
 
 Licensed under the BSD license.
 
