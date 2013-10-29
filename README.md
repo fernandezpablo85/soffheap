@@ -39,7 +39,7 @@ soffHeapMap.put("key", SomeObject()) //the object is moved out of the heap
 val someObjectFromOffheap = soffHeapMap.get("key")
 ```
 
-#### Snapshot(permanent data set in memory, without expiration) :
+##### Snapshot (permanent data set in memory, without expiration) :
 
 ```scala
 val ds = new DataSource[String, SomeType]{..} 
