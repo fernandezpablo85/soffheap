@@ -32,7 +32,7 @@ Add the following dependency to your pom.xml (Maven):
 </dependency>
 ```
 ```java
-SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plain Java access
+soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plain Java access
 
 soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
@@ -76,14 +76,14 @@ java -DmaximumSoffHeapMemoryInGB=4
 ```
 ## Tunings
 
-### Hinted classes: 
+### Hinted classes 
 The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
 
 ```scala 
-SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject])
+SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeObject])
                                               .withHintedClass(classOf[SomeOtherClass])
 ```
-### Heap cache: 
+### Heap cache 
 Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
 
 ```scala 
