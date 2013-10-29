@@ -1,19 +1,16 @@
 SoffHeap
-======= 
-
+===
 A simple library to store large set of objects out of the Java heap space using sun.misc.Unsafe to minimize GC overhead. 
 
 ## Usage (Scala)
-
 ### SBT settings 
 
 Add the following sbt dependency to your project settings:
 
 ```scala
-libraryDependencies += "com.despegar" % "soffheap" % "0.1.2"
+libraryDependencies += "com.despegar" % "soffheap" % "0.1.3"
 ```
-
-### Example
+### Example:
 
 ```scala
 val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
@@ -41,7 +38,6 @@ soffHeapMap.put("key1", new SomeObject()); //the object is moved out of the heap
 
 SomeObject someObjectFromOffheap = soffHeapMap.get("key1"); 
 ```
-
 ## Usage (Spring)
 
 ```xml
@@ -55,10 +51,10 @@ SomeObject someObjectFromOffheap = soffHeapMap.get("key1");
        http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean name="someSnapshot" class="com.despegar.soffheap.spring.SnapshotFactoryBean">
-        <property name="name" value="SnapshotTest"></property>
-        <property name="cronExpression" value="0/2 * * ? * *"></property>
-        <property name="path" value="/tmp"></property>
-        <property name="dataSource" ref="snapshotBuilderDs"></property>
+        <property name="name" value="SnapshotTest"/>
+        <property name="cronExpression" value="0/2 * * ? * *"/>
+        <property name="path" value="/tmp"/>
+        <property name="dataSource" ref="snapshotBuilderDs"/>
         <property name="hintedClasses" ref="hintedClasses"/>
     </bean>
 
@@ -70,7 +66,6 @@ SomeObject someObjectFromOffheap = soffHeapMap.get("key1");
 
 </beans>
 ```
-
 ## Configuration
 
 By default SoffHeap sets a limit of 2GB in the maximum amount of memory that can be allocated to store objects. This limit can be modified by passing a VM parameter.
@@ -79,11 +74,11 @@ By default SoffHeap sets a limit of 2GB in the maximum amount of memory that can
 ```java
 java -DmaximumSoffHeapMemoryInGB=4
 ```
-
 ## Tunings
   * Hinted classes: The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
     ```scala
-    SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject]).withHintedClass(classOf[SomeOtherClass])...
+    SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeComplexObject])
+						  .withHintedClass(classOf[SomeOtherClass])...
     ```
   * Heap cache: Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
     ```scala
@@ -93,7 +88,7 @@ java -DmaximumSoffHeapMemoryInGB=4
 ## Implementation details
 
   * Built in Scala.
-  * It uses Reference Counting to free unused objects.
+  * Reference Counting to free unused objects.
   * LRU Heap Cache.
   * Kryo and FST serialization. 
   * Metrics statistics.
@@ -114,12 +109,13 @@ val reporter =  GangliaReporter.forRegistry(registry)
                                .build(ganglia)
   
 reporter.start(1, TimeUnit.MINUTES)
-
+```
 ## Limitations
 
   * The first implementation only supports a keyvalue store.
   * Only support sun.misc.Unsafe. Fallback to DirectBuffer usage is pending.
   * No TTL support.
 
-
+## History
+  * October 29, 2013   Released version 0.1.3
 
