@@ -13,9 +13,8 @@ Add the following dependency to your pom.xml (Maven):
 	<version>0.1.4</version>
 </dependency>
 ```
-```java								      
-								      //Use buildJ for plain Java access
-SoffHeapMapBuilder<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); 
+```java
+soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plain Java access
 
 soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
