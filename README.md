@@ -2,24 +2,6 @@ SoffHeap
 ===
 A simple library to store large set of objects out of the Java heap space using sun.misc.Unsafe to minimize GC overhead. 
 
-## Usage (Scala)
-### SBT settings 
-
-Add the following sbt dependency to your project settings:
-
-```scala
-libraryDependencies += "com.despegar" % "soffheap" % "0.1.4"
-```
-### Example:
-
-```scala
-val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
-
-soffHeapMap.put("key", SomeObject()) //the object is moved out of the heap
-
-val someObjectFromOffheap = soffHeapMap.get("key")
-```
-
 ### Usage (Java)
 
 Add the following dependency to your pom.xml (Maven):
@@ -28,7 +10,7 @@ Add the following dependency to your pom.xml (Maven):
 <dependency>
 	<group>com.despegar</group>
 	<artifactId>soffheap</artifactId>
-	<version>0.1.2</version>
+	<version>0.1.4</version>
 </dependency>
 ```
 ```java
@@ -38,6 +20,38 @@ soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
 SomeObject someObjectFromOffheap = soffHeapMap.get("key"); 
 ```
+
+## Usage (Scala)
+### SBT settings 
+
+Add the following sbt dependency to your project settings:
+
+```scala
+libraryDependencies += "com.despegar" % "soffheap" % "0.1.4"
+```
+### Examples:
+
+```scala
+val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
+
+soffHeapMap.put("key", SomeObject()) //the object is moved out of the heap
+
+val someObjectFromOffheap = soffHeapMap.get("key")
+```
+
+## Snapshot(permanent data set in memory, without expiration) :
+
+```scala
+val ds = new DataSource[String, SomeType]{..} 
+val snapshot = SnapshotBuilder[String, SomeType]().withDiskPersistence() //save to disk
+						  .withName("snapshotName") 
+						  .withDataSource(ds)
+						  .withReloadsAt("0/5 * * ? * *") //schedule a reload
+						  .build()
+snapshot.get("key")
+snapshot.multiGet("key" :: "key2" :: Nil)
+```
+
 ## Usage (Spring)
 
 ```xml
@@ -80,14 +94,14 @@ java -DmaximumSoffHeapMemoryInGB=4
 The serializers used by SoffHeap can be tuned if necessary passing the types involved in serialization/deserialization of your objects.
 
 ```scala 
-SoffHeapMapBuilder[String,SomeComplexObject]().withHintedClass(classOf[SomeObject])
-                                              .withHintedClass(classOf[SomeOtherClass])
+SoffHeapMapBuilder[String,SomeType]().withHintedClass(classOf[SomeType])
+                                     .withHintedClass(classOf[SomeOtherClass])
 ```
 ### Heap cache 
 Frequent accesses to objects can be optimized by enabling an LRU cache in the heap. Maximum heap elements can be configured.
 
 ```scala 
-SoffHeapMapBuilder[String,SomeComplexObject]().withMaximumHeapElements(10)
+SoffHeapMapBuilder[String,SomeComplexType]().withMaximumHeapElements(10)
 ```
 
 ## Implementation details

@@ -20,10 +20,10 @@
  */
 package com.despegar.soffheap.concurrent;
 
+import com.despegar.soffheap.CronExpression;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-
-import com.despegar.soffheap.CronExpression;
 
 
 /**
@@ -35,7 +35,6 @@ public interface CronExecutorService extends Executor, ExecutorService
 {
   /**
    * Schedules the specified task to execute according to the specified cron expression.
-   * @see org.quartz.CronExpression
    * @param task the Runnable task to schedule
    * @param expression a cron expression
    */
