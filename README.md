@@ -43,12 +43,11 @@ val someObjectFromOffheap = soffHeapMap.get("key")
 
 ```scala
 val ds = new DataSource[String, SomeType]{..} 
-val snapshot = SnapshotBuilder[String, SomeType]()
-			.withDiskPersistence() //save to disk
-			.withName("snapshotName") 
-			.withDataSource(ds)
-			.withReloadsAt("0/5 * * ? * *") //schedule a reload
-			.build()
+val snapshot = SnapshotBuilder[String, SomeType]().withDiskPersistence()
+						  .withName("snapshotName") 
+						  .withDataSource(ds)
+						  .withReloadsAt("0/5 * * ? * *") //schedule a reload
+						  .build()
 snapshot.get("key")
 snapshot.multiGet("key" :: "key1" :: Nil)
 ```
