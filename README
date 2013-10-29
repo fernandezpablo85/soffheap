@@ -1,42 +1,50 @@
 SoffHeap
+======= 
 
 A simple library to store large set of objects out of the Java heap space using sun.misc.Unsafe to minimize GC overhead. 
 
-Usage (Scala)
+## Usage (Scala)
 
-SBT settings 
+### SBT settings 
 
 Add the following sbt dependency to your project settings:
 
-libraryDependencies += "com.despegar" % "soffheap" % "0.1.2" //
+```scala
+libraryDependencies += "com.despegar" % "soffheap" % "0.1.2"
+```
 
-Example
+### Example
 
+```scala
 val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
 
 soffHeapMap.put("key1", SomeObject()) //the object is moved out of the heap
 
 val someObjectFromOffheap = soffHeapMap.get("key1")
+```
 
-Usage (Java)
-
-SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plan Java access
-
-soffHeapMap.put("key1", new SomeObject()); //the object is moved out of the heap
-
-SomeObject someObjectFromOffheap = soffHeapMap.get("key1"); 
-
+### Usage (Java)
 
 Add the following dependency to your pom.xml (Maven):
 
+```xml
 <dependency>
 	<group>com.despegar</group>
 	<artifactId>soffheap</artifactId>
 	<version>0.1.2</version>
 </dependency>
+```
+```java
+SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plan Java access
 
-Usage (Spring)
+soffHeapMap.put("key1", new SomeObject()); //the object is moved out of the heap
 
+SomeObject someObjectFromOffheap = soffHeapMap.get("key1"); 
+```
+
+## Usage (Spring integration)
+
+```xml
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
@@ -57,8 +65,9 @@ Usage (Spring)
     </util:set>
 
 </beans>
+```
 
-Configuration
+### Configuration
 
 By default SoffHeap sets a limit of 2GB in the maximum amount of memory that can be allocated to store objects. This limit can be modified by passing a VM parameter.
 
