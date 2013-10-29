@@ -8,16 +8,16 @@ A simple library to store large set of objects out of the Java heap space using 
 Add the following sbt dependency to your project settings:
 
 ```scala
-libraryDependencies += "com.despegar" % "soffheap" % "0.1.3"
+libraryDependencies += "com.despegar" % "soffheap" % "0.1.4"
 ```
 ### Example:
 
 ```scala
 val soffHeapMap = SoffHeapMapBuilder[String,SomeObject]().build()
 
-soffHeapMap.put("key1", SomeObject()) //the object is moved out of the heap
+soffHeapMap.put("key", SomeObject()) //the object is moved out of the heap
 
-val someObjectFromOffheap = soffHeapMap.get("key1")
+val someObjectFromOffheap = soffHeapMap.get("key")
 ```
 
 ### Usage (Java)
@@ -34,9 +34,9 @@ Add the following dependency to your pom.xml (Maven):
 ```java
 SoffHeapMap<String,SomeObject> soffHeapMap = new SoffHeapMapBuilder<String,SomeObject>().buildJ(); //Use buildJ for plan Java access
 
-soffHeapMap.put("key1", new SomeObject()); //the object is moved out of the heap
+soffHeapMap.put("key", new SomeObject()); //the object is moved out of the heap
 
-SomeObject someObjectFromOffheap = soffHeapMap.get("key1"); 
+SomeObject someObjectFromOffheap = soffHeapMap.get("key"); 
 ```
 ## Usage (Spring)
 
@@ -117,5 +117,13 @@ reporter.start(1, TimeUnit.MINUTES)
   * No TTL support.
 
 ## History
-  * October 29, 2013   Released version 0.1.3
+  * October 29, 2013   Released version 0.1.4
+
+## Licence
+
+Licensed under the BSD license.
+
+Copyright (c) 2013 Despegar.com, http://www.despegar.com/
+
+
 
